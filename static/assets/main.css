@@ -22,8 +22,17 @@ ul, li {
 
 #wrapper {
 	width: 320px;
-	padding: 48px 24px;
+	padding: 28px 24px 62px;
 	margin: 0 auto;
+}
+
+#logo {
+	margin-bottom: 52px;
+}
+
+#logo img {
+	width: 28px;
+	filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(332deg) brightness(106%) contrast(102%);
 }
 
 #profile-chart {
