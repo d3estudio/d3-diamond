@@ -4,7 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
     <title>Feedback D3</title>
+
     <link rel="stylesheet" media="all" href="/static/assets/main.css" />
     <link rel="stylesheet" media="all" href="/static/assets/radar-chart.css" />
     <script src="/static/assets/src/jquery-3.5.1.min.js"></script>
@@ -105,6 +107,7 @@
     </div>
 </body>
 <script type="text/javascript">
+
 /* ----------------------------------------------
 // Função que faz o parse e já atualiza a posição 
 ---------------------------------------------- */
@@ -113,9 +116,11 @@ function parceProfileData(profileData) {
     document.getElementById('profile-name').innerHTML = profileData["NAME"];
 
     var range = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
-    var grades = [
+    var grades = 
+    [
         ["index", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
     ];
+    
     for (var i = 0; i < range.length; i++) {
         var bigR = range[i].toUpperCase();
         console.log(range[i]);
@@ -137,39 +142,20 @@ function parceProfileData(profileData) {
         // !!!!!!!!!!!!!!!!!!!!
         // Gera o array notas
         // !!!!!!!!!!!!!!!!!!!!
-        var grade = [range[i]];
-        if (i == 8) {
-            grade.push(profileData[range[0].toUpperCase()]);
-            grade.push(0);
-            grade.push(0); // Refazer essa parte
-            grade.push(0);
-            grade.push(0);
-            grade.push(0);
-            grade.push(0);
-            grade.push(0);
-            grade.push(profileData[range[a - 1].toUpperCase()]);
-        } else if (i == 9) {
-            grade.push(profileData[range[0].toUpperCase()]);
-            grade.push(profileData[range[1].toUpperCase()]);
-            grade.push(0);
-            grade.push(0);
-            grade.push(0); // Refazer essa parte
-            grade.push(0);
-            grade.push(0);
-            grade.push(0);
-            grade.push(0);
-            grade.push(0);
-        } else {
-            for (var a = 0; a < range.length - 1; a++) {
-                if (i == a) {
-                    grade.push(profileData[range[a].toUpperCase()]);
-                    grade.push(profileData[range[a + 1].toUpperCase()]);
-                } else {
-                    grade.push(0);
-                }
+        var grade = [range[i]]; // Aplica o index
+        
+          for (var a = 0; a < range.length-1; a++) {  
+            if(i==a){
+              grade.push(profileData[range[a].toUpperCase()]);
+              grade.push(profileData[range[a+1].toUpperCase()]);
+            }else{
+              grade.push(0);
             }
+          // }
         }
+        
         grades.push(grade);
+        grades[10] = ["j", profileData[range[0].toUpperCase()],0,0,0,0,0,0,0,0,profileData[range[9].toUpperCase()]];
     }
     return grades;
 }
