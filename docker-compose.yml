@@ -1,0 +1,13 @@
+version: '2'
+services:
+  feedback:
+    build:
+      context: .
+    volumes:
+      - .:/app
+    env_file:
+      .env
+    expose:
+      - "5000"
+    ports:
+      - "5000:5000"
