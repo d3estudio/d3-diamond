@@ -117,131 +117,132 @@
         
     </div>
 
-<script type="text/javascript">
+    <script type="text/javascript">
 
-/* ----------------------------------------------
-// Função que faz o parse e já atualiza a posição 
----------------------------------------------- */
-function parceProfileData(profileData) {
+    /* ----------------------------------------------
+    // Função que faz o parse e já atualiza a posição 
+    ---------------------------------------------- */
+    function parceProfileData(profileData) {
 
-    document.getElementById('profile-name').innerHTML = profileData["NAME"];
+        document.getElementById('profile-name').innerHTML = profileData["NAME"];
 
-    var range = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
-    var grades = 
-    [
-        ["index", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
-    ];
+        var range = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
+        var grades = 
+        [
+            ["index", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
+        ];
 
-    for (var i = 0; i < range.length; i++) {
-        var bigR = range[i].toUpperCase();
-        console.log(range[i]);
+        for (var i = 0; i < range.length; i++) {
+            var bigR = range[i].toUpperCase();
+            console.log(range[i]);
 
-        var g = document.getElementById('grade-' + range[i]);
-        var gd = g.querySelector(".competence-grade");
-        var gv = g.querySelector(".change");
+            var g = document.getElementById('grade-' + range[i]);
+            var gd = g.querySelector(".competence-grade");
+            var gv = g.querySelector(".change");
 
-        // Aplica a nota
-        gd.innerHTML = Number(profileData[bigR]).toFixed(1);
+            // Aplica a nota
+            gd.innerHTML = Number(profileData[bigR]).toFixed(1);
 
-        // Mudar o status da nota
-        var variation = profileData["CHANGE_" + bigR];
-        var varClass = "neutral";
-        // mudar para um switch case
-        if (variation == -1) { varClass = "negative"; } else if (variation == 1) { varClass = "positive"; }
-        gv.className = "change " + varClass;
+            // Mudar o status da nota
+            var variation = profileData["CHANGE_" + bigR];
+            var varClass = "neutral";
+            // mudar para um switch case
+            if (variation == -1) { varClass = "negative"; } else if (variation == 1) { varClass = "positive"; }
+            gv.className = "change " + varClass;
 
-        // !!!!!!!!!!!!!!!!!!!!
-        // Gera o array notas
-        // !!!!!!!!!!!!!!!!!!!!
-        var grade = [range[i]]; // Aplica o index
-        
-          for (var a = 0; a < range.length-1; a++) {  
-            if(i==a){
-              grade.push(profileData[range[a].toUpperCase()]);
-              grade.push(profileData[range[a+1].toUpperCase()]);
-            }else{
-              grade.push(0);
-            }
-          // }
-        }
-        
-        grades.push(grade);
-        grades[10] = ["j", profileData[range[0].toUpperCase()],0,0,0,0,0,0,0,0,profileData[range[9].toUpperCase()]];
-    }
-    return grades;
-}
-
-function showRadar(csv) {
-    var data = [];
-    var chart = RadarChart.chart();
-    var w = h = 280;
-
-    headers = []
-    csv.forEach(function(item, i) {
-        if (i == 0) {
-            headers = item;
-        } else {
-            newSeries = {};
-            item.forEach(function(v, j) {
-                if (j == 0) {
-                    newSeries.className = v;
-                    newSeries.axes = [];
-                } else {
-                    newSeries.axes.push({ "axis": [headers[j]], "value": parseFloat(v) });
+            // !!!!!!!!!!!!!!!!!!!!
+            // Gera o array notas
+            // !!!!!!!!!!!!!!!!!!!!
+            var grade = [range[i]]; // Aplica o index
+            
+              for (var a = 0; a < range.length-1; a++) {  
+                if(i==a){
+                  grade.push(profileData[range[a].toUpperCase()]);
+                  grade.push(profileData[range[a+1].toUpperCase()]);
+                }else{
+                  grade.push(0);
                 }
-            });
-            data.push(newSeries);
+              // }
+            }
+            
+            grades.push(grade);
+            grades[10] = ["j", profileData[range[0].toUpperCase()],0,0,0,0,0,0,0,0,profileData[range[9].toUpperCase()]];
         }
-    })
-
-    RadarChart.defaultConfig.radius = 3;
-    RadarChart.defaultConfig.w = w;
-    RadarChart.defaultConfig.h = h;
-
-    var mycfg = {
-        color: function(i) {
-            c = [
-                '1A1919',
-                '111111',
-                '3E3E3E',
-                '323232',
-                '424141',
-                '605E5E',
-                '7E7D7D',
-                '9E9E9E',
-                'CCCCCC',
-                '0C0C0C',
-            ];
-            return c[i];
-        },
+        return grades;
     }
 
-    RadarChart.draw("#chart-container", data, mycfg);
-    var divVal = document.getElementById('chart-container');
-}
+    function showRadar(csv) {
+        var data = [];
+        var chart = RadarChart.chart();
+        var w = h = 280;
 
-/* ----------------------------------------------
-// Buscar parâmetros na URL 
----------------------------------------------- */
-var getUrlParameter = function getUrlParameter(sParam) {
-    var sPageURL = window.location.search.substring(1),
-        sURLVariables = sPageURL.split('&'),
-        sParameterName,
-        i;
+        headers = []
+        csv.forEach(function(item, i) {
+            if (i == 0) {
+                headers = item;
+            } else {
+                newSeries = {};
+                item.forEach(function(v, j) {
+                    if (j == 0) {
+                        newSeries.className = v;
+                        newSeries.axes = [];
+                    } else {
+                        newSeries.axes.push({ "axis": [headers[j]], "value": parseFloat(v) });
+                    }
+                });
+                data.push(newSeries);
+            }
+        })
 
-    for (i = 0; i < sURLVariables.length; i++) {
-        sParameterName = sURLVariables[i].split('=');
-        if (sParameterName[0] === sParam) {
-            return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+        RadarChart.defaultConfig.radius = 3;
+        RadarChart.defaultConfig.w = w;
+        RadarChart.defaultConfig.h = h;
+
+        var mycfg = {
+            color: function(i) {
+                c = [
+                    '#1A1919',
+                    '#111111',
+                    '#3E3E3E',
+                    '#323232',
+                    '#424141',
+                    '#605E5E',
+                    '#7E7D7D',
+                    '#9E9E9E',
+                    '#CCCCCC',
+                    '#0C0C0C',
+                ];
+                return c[i];
+            },
         }
+
+        RadarChart.draw("#chart-container", data, mycfg);
+        var divVal = document.getElementById('chart-container');
     }
-};
 
-var profileID = getUrlParameter('u') ? getUrlParameter('u') : "asd97asdhasd87";
+    /* ----------------------------------------------
+    // Buscar parâmetros na URL 
+    ---------------------------------------------- */
+    var getUrlParameter = function getUrlParameter(sParam) {
+        var sPageURL = window.location.search.substring(1),
+            sURLVariables = sPageURL.split('&'),
+            sParameterName,
+            i;
 
-$.get("/api/" + profileID, function(data) {
-    showRadar(parceProfileData(data[0]));
-});
-</script>
-</body>
+        for (i = 0; i < sURLVariables.length; i++) {
+            sParameterName = sURLVariables[i].split('=');
+            if (sParameterName[0] === sParam) {
+                return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+            }
+        }
+    };
+
+    var profileID = getUrlParameter('u') ? getUrlParameter('u') : "asd97asdhasd87";
+
+    $.get("/api/" + profileID, function(data) {
+        showRadar(parceProfileData(data[0]));
+    });
+    </script>
+    
+    </body>
 </html>
