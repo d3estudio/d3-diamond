@@ -4,7 +4,7 @@ var RadarChart = {
     w: 600,
     h: 600,
     factor: 0.95,
-    factorLegend: 1,
+    factorLegend: 0,
     levels: 3,
     levelTick: false,
     TickLength: 10,
