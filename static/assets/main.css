@@ -27,26 +27,29 @@ ul, li {
 }
 
 #profile-chart {
-	/*display: block;*/
 	position: relative;
-	/*overflow: hidden;*/
 	margin-bottom: 64px;
+	height: 320px;
+	width: 360px;
 }
 
 #chart-container{
-	border: solid 1px;
-	height: 320px;
+	/*border: solid 1px;*/
+	height: 100%;
+	width: 100%;
 	float: left;
 }
 
 #container-mask {
-	border: solid 1px blue;
-	height: 320px;
-	width: 360px;
-	margin-bottom: 64px;
+	/*border: solid 1px blue;*/
+	height: 100%;
+	width: 100%;
 	position: absolute;
 	top: 0px;
-	/*float: left;*/
+	
+	background-image: url(matriz.svg);
+	background-repeat: no-repeat;
+  	background-position: center; 
 }
 
 #profile, .profile-date, #save-profile {
