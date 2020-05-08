@@ -12,9 +12,9 @@
   font-size: 10px;
 }
 
-.legend {
+/*.legend {
   fill: #ffffff;
-}
+}*/
 
 .radar-chart .axis .legend.top {
   dy:1em;

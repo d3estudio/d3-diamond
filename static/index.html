@@ -168,27 +168,9 @@ function parceProfileData(profileData) {
 function showRadar(csv) {
     var data = [];
     var chart = RadarChart.chart();
-    var w = 360;
-    var h = 330;
-
-    // csv = c.split("\n").map(function(i){return i.split(",")})
+    var w = h = 280;
+    
     headers = []
-
-    // var csv = [
-    //   ["index","a","b","c","d","e","f","g","h","i","j"],
-    //   ["a",5,5,0,0,0,0,0,0,0],
-    //   ["b",0,5,5,0,0,0,0,0,0],
-    //   ["c",0,0,5,5,0,0,0,0,0],
-    //   ["d",0,0,0,5,5,0,0,0,0],
-    //   ["e",0,0,0,0,5,5,0,0,0],
-    //   ["f",0,0,0,0,0,5,5,0,0],
-    //   ["g",0,0,0,0,0,0,5,5,0],
-    //   ["h",0,0,0,0,0,0,0,5,5],
-    //   ["i",5,0,0,0,0,0,0,0,5],
-    // ];
-
-
-
     csv.forEach(function(item, i) {
         if (i == 0) {
             headers = item;
