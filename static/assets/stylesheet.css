@@ -1,0 +1,155 @@
+html, body {
+	background-color: #000;
+	color: #fff;
+}
+
+h1 {
+	margin: 8px 0 52px 0;
+
+	font-family: 'GiorgioSansBold', sans-serif;
+	text-transform: uppercase;
+	font-style: normal;
+	font-weight: bold;
+	font-size: 64px;
+	line-height: 87%;
+}
+
+ul, li {
+	list-style: none;
+	padding: 0;
+	margin:0;
+}
+
+#wrapper {
+	width: 360px;
+	padding: 48px 24px;
+	margin: 0 auto;
+}
+
+#chart-container {
+	border: solid 1px;
+	height: 320px;
+}
+
+#profile, .profile-date, #save-profile {
+	font-family: 'Cerebri Sans', sans-serif;	
+	font-style: normal;
+}
+
+.profile-date {
+	color: #999E9C;
+}
+
+#profile {
+	margin-top: 26px;
+	font-weight: bold;
+}
+
+.profile-date {
+	font-weight: normal;
+	font-size: 12px;
+	line-height: 15px;
+}
+
+/*.competence-ref {
+	margin-bottom: 20px;
+
+	color: #999E9C;
+	font-size: 12px;
+	line-height: 15px;	
+}*/
+
+/*.competence-grade {
+	font-size: 36px;
+	line-height: 46px;
+}*/
+
+.grade {
+	display: inline-block;
+	float: right;
+	margin-top: -6px;
+}
+
+.grade .competence-grade {
+	display: inline-block;
+}
+.grade .change {
+	display: inline-block;
+	float: right;
+	width: 8px;
+	height: 8px;
+
+	margin-top: 12px;
+	margin-left: 6px;
+	background-repeat: no-repeat;
+}
+	.change.positive {
+		background-image: url(grade-up.svg);
+	}
+
+	.change.negative {
+		background-image: url(grade-down.svg);
+	}
+
+	.change.neutral {
+		background-image: url(grade-neutral.svg);
+	}
+
+.competence-grade {
+	font-size: 24px;
+}
+
+.competence-title, .competence-description {
+	margin:8px 0 0 0;
+}
+
+.competence-title {
+	font-size: 20px;
+	line-height: 25px;
+}
+
+.competence-description {
+	font-weight: normal;
+	font-size: 12px;
+	line-height: 15px;
+}
+
+#profile li{
+	margin-bottom: 24px;
+	padding-bottom: 16px;
+
+	border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+#save-profile {
+	text-align: center;
+	font-weight: normal;
+	font-size: 12px;
+	line-height: 15px;
+}
+
+
+/* Fonts */
+@font-face {
+    font-family: 'GiorgioSansBold';
+    src: url('GiorgioSansBold.woff2') format('woff2'),
+        url('GiorgioSansBold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Cerebri Sans';
+    src: url('CerebriSans-Bold.woff2') format('woff2'),
+        url('CerebriSans-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Cerebri Sans';
+    src: url('CerebriSans-Regular.woff2') format('woff2'),
+        url('CerebriSans-Regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
