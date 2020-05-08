@@ -130,6 +130,10 @@ ul, li {
 	border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
 
+#profile li:last-child {
+	border: none;
+}
+
 #save-profile {
 	text-align: center;
 	font-weight: normal;
