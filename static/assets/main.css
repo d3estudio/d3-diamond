@@ -26,10 +26,27 @@ ul, li {
 	margin: 0 auto;
 }
 
-#chart-container {
-	/*border: solid 1px;*/
-	height: 320px;
+#profile-chart {
+	/*display: block;*/
+	position: relative;
+	/*overflow: hidden;*/
 	margin-bottom: 64px;
+}
+
+#chart-container{
+	border: solid 1px;
+	height: 320px;
+	float: left;
+}
+
+#container-mask {
+	border: solid 1px blue;
+	height: 320px;
+	width: 360px;
+	margin-bottom: 64px;
+	position: absolute;
+	top: 0px;
+	/*float: left;*/
 }
 
 #profile, .profile-date, #save-profile {

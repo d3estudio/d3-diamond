@@ -18,7 +18,12 @@
     <div id="wrapper">
         <div class="profile-date">7 de maio de 2020</div>
         <h1 id="profile-name">FERNANDO TRANQUILLINI</h1>
-        <div id="chart-container"></div>
+        
+        <div id="profile-chart">
+            <div id="chart-container"></div>
+            <div id="container-mask"></div>
+        </div>
+
         <ul id="profile">
             <li class="profile-grade" id="grade-a">
                 <div class="grade">
@@ -120,7 +125,7 @@ function parceProfileData(profileData) {
     [
         ["index", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
     ];
-    
+
     for (var i = 0; i < range.length; i++) {
         var bigR = range[i].toUpperCase();
         console.log(range[i]);
