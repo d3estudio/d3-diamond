@@ -21,7 +21,7 @@ ul, li {
 }
 
 #wrapper {
-	width: 360px;
+	width: 320px;
 	padding: 48px 24px;
 	margin: 0 auto;
 }
@@ -30,7 +30,7 @@ ul, li {
 	position: relative;
 	margin-bottom: 64px;
 	height: 340px;
-	width: 360px;
+	width: 320px;
 }
 
 #chart-container{
@@ -39,7 +39,7 @@ ul, li {
 	
 	position: absolute;
 	top: 30px;
-	left: 40px;
+	left: 20px;
 }
 
 #container-mask {
