@@ -1,120 +1,249 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta charset="utf-8">
-	<title>D3</title>
-	<link rel="stylesheet" media="all" href="/static/assets/stylesheet.css" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Feedback D3</title>
+    <link rel="stylesheet" media="all" href="/static/assets/stylesheet.css" />
+    <link rel="stylesheet" media="all" href="/static/assets/radar-chart.css" />
+    <script src="/static/assets/src/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="http://d3js.org/d3.v3.js"></script>
+    <script type="text/javascript" src="/static/assets/radar-chart.js"></script>
 </head>
+
 <body>
-
-<div id="wrapper">
-
-  <div class="profile-date">7 de maio de 2020</div> 
-
-  <h1>FERNANDO TRANQUILLINI</h1>
-
-  <div id="chart-container"></div>
-
-  <ul id="profile">
-    <li class="profile-grade" id="grade-a">
-      <div class="grade">
-        <div class="competence-grade">3.5</div>  
-        <div class="change positive"></div>
-      </div>
-      <h3 class="competence-title">A. Desbravamento</h3>
-      <p class="competence-description">Abrir mata virgem com facão. Coragem para explorar fronteiras além das já mapeadas.</p>
-    </li>
-
-    <li class="profile-grade" id="grade-b">
-      <div class="grade">
-        <div class="competence-grade">3.5</div>  
-        <div class="change negative"></div>
-      </div>
-      <h3 class="competence-title">B. Comprometimento</h3>
-      <p class="competence-description">Honrar o compromisso. Absorver diferentes inteligências para crescer.</p>
-    </li>
-
-    <li class="profile-grade" id="grade-c">
-      <div class="grade">
-        <div class="competence-grade">3.5</div>  
-        <div class="change neutral"></div>
-      </div>
-      <h3 class="competence-title">C. Criatividade</h3>
-      <p class="competence-description">Sentir a sua veia criativa pulsar. Potência para criar com multidisciplinaridade e assim expandir soluções.</p>
-    </li>
-
-    <li class="profile-grade" id="grade-d">
-      <div class="grade">
-        <div class="competence-grade">3.5</div>  
-        <div class="change positive"></div>
-      </div>
-      <h3 class="competence-title">D. Comprometimento</h3>
-      <p class="competence-description">Honrar o compromisso. Absorver diferentes inteligências para crescer.</p>
-    </li>
-
-    <li class="profile-grade" id="grade-e">
-      <div class="grade">
-        <div class="competence-grade">3.5</div>  
-        <div class="change positive"></div>
-      </div>
-      <h3 class="competence-title">E. Contundência</h3>
-      <p class="competence-description">Quebrar o existe. Fôlego para questionar o existente, quebrar se necessário e recriar com confianca.</p>
-    </li>
-
-    <li class="profile-grade" id="grade-f">
-      <div class="grade">
-        <div class="competence-grade">3.5</div>  
-        <div class="change positive"></div>
-      </div>
-      <h3 class="competence-title">F. Excelência</h3>
-      <p class="competence-description">Busca constante para aperfeiçoar a paixão. Realização das tarefas com o nível de excelência dentro da sua fase.</p>
-    </li>
-
-    <li class="profile-grade" id="grade-g">
-      <div class="grade">
-        <div class="competence-grade">3.5</div>  
-        <div class="change positive"></div>
-      </div>
-      <h3 class="competence-title">G. Comunicação</h3>
-      <p class="competence-description">Ainda não inventamos a telepatia. Prática da comunicação clara dentro do time.</p>
-    </li>
-
-    <li class="profile-grade" id="grade-h">
-      <div class="grade">
-        <div class="competence-grade">3.5</div>  
-        <div class="change positive"></div>
-      </div>
-      <h3 class="competence-title">H. Autonomia</h3>
-      <p class="competence-description">Ser dono de si. Assumir responsabilidades, manter-se informado e saber para onde o time está indo.</p>
-    </li>
-
-    <li class="profile-grade" id="grade-i">
-      <div class="grade">
-        <div class="competence-grade">3.5</div>  
-        <div class="change positive"></div>
-      </div>
-      <h3 class="competence-title">I. Realização</h3>
-      <p class="competence-description">Decolar e colocar na rua. Evoluir o projeto através da materialização das ideias criativas.</p>
-    </li>
-
-    <li class="profile-grade" id="grade-j">
-      <div class="grade">
-        <div class="competence-grade">3.5</div>  
-        <div class="change positive"></div>
-      </div>
-      <h3 class="competence-title">J. Sensibilidade</h3>
-      <p class="competence-description">Tato com as pessoas e chamego com a comunidade. Aprendizados através do poder da escuta com os outros.</p>
-    </li>
-
-  </ul>
-
-  <!--
+    <div id="wrapper">
+        <div class="profile-date">7 de maio de 2020</div>
+        <h1 id="profile-name">FERNANDO TRANQUILLINI</h1>
+        <div id="chart-container"></div>
+        <ul id="profile">
+            <li class="profile-grade" id="grade-a">
+                <div class="grade">
+                    <div class="competence-grade">3.5</div>
+                    <div class="change positive"></div>
+                </div>
+                <h3 class="competence-title">A. Desbravamento</h3>
+                <p class="competence-description">Abrir mata virgem com facão. Coragem para explorar fronteiras além das já mapeadas.</p>
+            </li>
+            <li class="profile-grade" id="grade-b">
+                <div class="grade">
+                    <div class="competence-grade">3.5</div>
+                    <div class="change negative"></div>
+                </div>
+                <h3 class="competence-title">B. Comprometimento</h3>
+                <p class="competence-description">Honrar o compromisso. Absorver diferentes inteligências para crescer.</p>
+            </li>
+            <li class="profile-grade" id="grade-c">
+                <div class="grade">
+                    <div class="competence-grade">3.5</div>
+                    <div class="change neutral"></div>
+                </div>
+                <h3 class="competence-title">C. Criatividade</h3>
+                <p class="competence-description">Sentir a sua veia criativa pulsar. Potência para criar com multidisciplinaridade e assim expandir soluções.</p>
+            </li>
+            <li class="profile-grade" id="grade-d">
+                <div class="grade">
+                    <div class="competence-grade">3.5</div>
+                    <div class="change positive"></div>
+                </div>
+                <h3 class="competence-title">D. Comprometimento</h3>
+                <p class="competence-description">Honrar o compromisso. Absorver diferentes inteligências para crescer.</p>
+            </li>
+            <li class="profile-grade" id="grade-e">
+                <div class="grade">
+                    <div class="competence-grade">3.5</div>
+                    <div class="change positive"></div>
+                </div>
+                <h3 class="competence-title">E. Contundência</h3>
+                <p class="competence-description">Quebrar o existe. Fôlego para questionar o existente, quebrar se necessário e recriar com confianca.</p>
+            </li>
+            <li class="profile-grade" id="grade-f">
+                <div class="grade">
+                    <div class="competence-grade">3.5</div>
+                    <div class="change positive"></div>
+                </div>
+                <h3 class="competence-title">F. Excelência</h3>
+                <p class="competence-description">Busca constante para aperfeiçoar a paixão. Realização das tarefas com o nível de excelência dentro da sua fase.</p>
+            </li>
+            <li class="profile-grade" id="grade-g">
+                <div class="grade">
+                    <div class="competence-grade">3.5</div>
+                    <div class="change positive"></div>
+                </div>
+                <h3 class="competence-title">G. Comunicação</h3>
+                <p class="competence-description">Ainda não inventamos a telepatia. Prática da comunicação clara dentro do time.</p>
+            </li>
+            <li class="profile-grade" id="grade-h">
+                <div class="grade">
+                    <div class="competence-grade">3.5</div>
+                    <div class="change positive"></div>
+                </div>
+                <h3 class="competence-title">H. Autonomia</h3>
+                <p class="competence-description">Ser dono de si. Assumir responsabilidades, manter-se informado e saber para onde o time está indo.</p>
+            </li>
+            <li class="profile-grade" id="grade-i">
+                <div class="grade">
+                    <div class="competence-grade">3.5</div>
+                    <div class="change positive"></div>
+                </div>
+                <h3 class="competence-title">I. Realização</h3>
+                <p class="competence-description">Decolar e colocar na rua. Evoluir o projeto através da materialização das ideias criativas.</p>
+            </li>
+            <li class="profile-grade" id="grade-j">
+                <div class="grade">
+                    <div class="competence-grade">3.5</div>
+                    <div class="change positive"></div>
+                </div>
+                <h3 class="competence-title">J. Sensibilidade</h3>
+                <p class="competence-description">Tato com as pessoas e chamego com a comunidade. Aprendizados através do poder da escuta com os outros.</p>
+            </li>
+        </ul>
+        <!--
   <div id="save-profile">Salvar</div>
   -->
-
-</div>
-
-
+    </div>
 </body>
+<script type="text/javascript">
+/* ----------------------------------------------
+// Função que faz o parse e já atualiza a posição 
+---------------------------------------------- */
+function parceProfileData(profileData) {
+
+    document.getElementById('profile-name').innerHTML = profileData["NAME"];
+
+    var range = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
+    var grades = [
+        ["index", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j"]
+    ];
+    for (var i = 0; i < range.length; i++) {
+        var bigR = range[i].toUpperCase();
+        console.log(range[i]);
+
+        var g = document.getElementById('grade-' + range[i]);
+        var gd = g.querySelector(".competence-grade");
+        var gv = g.querySelector(".change");
+
+        // Aplica a nota
+        gd.innerHTML = Number(profileData[bigR]).toFixed(1);
+
+        // Mudar o status da nota
+        var variation = profileData["CHANGE_" + bigR];
+        var varClass = "neutral";
+        // mudar para um switch case
+        if (variation == -1) { varClass = "negative"; } else if (variation == 1) { varClass = "positive"; }
+        gv.className = "change " + varClass;
+
+        // !!!!!!!!!!!!!!!!!!!!
+        // Gera o array notas
+        // !!!!!!!!!!!!!!!!!!!!
+        var grade = [range[i]];
+        if (i == 8) {
+            grade.push(profileData[range[0].toUpperCase()]);
+            grade.push(0);
+            grade.push(0); // Refazer essa parte
+            grade.push(0);
+            grade.push(0);
+            grade.push(0);
+            grade.push(0);
+            grade.push(0);
+            grade.push(profileData[range[a - 1].toUpperCase()]);
+        } else if (i == 9) {
+            grade.push(profileData[range[0].toUpperCase()]);
+            grade.push(profileData[range[1].toUpperCase()]);
+            grade.push(0);
+            grade.push(0);
+            grade.push(0); // Refazer essa parte
+            grade.push(0);
+            grade.push(0);
+            grade.push(0);
+            grade.push(0);
+            grade.push(0);
+        } else {
+            for (var a = 0; a < range.length - 1; a++) {
+                if (i == a) {
+                    grade.push(profileData[range[a].toUpperCase()]);
+                    grade.push(profileData[range[a + 1].toUpperCase()]);
+                } else {
+                    grade.push(0);
+                }
+            }
+        }
+        grades.push(grade);
+    }
+    return grades;
+}
+
+function showRadar(csv) {
+    var data = [];
+    var chart = RadarChart.chart();
+    var w = 360;
+    var h = 330;
+
+    // csv = c.split("\n").map(function(i){return i.split(",")})
+    headers = []
+
+    // var csv = [
+    //   ["index","a","b","c","d","e","f","g","h","i","j"],
+    //   ["a",5,5,0,0,0,0,0,0,0],
+    //   ["b",0,5,5,0,0,0,0,0,0],
+    //   ["c",0,0,5,5,0,0,0,0,0],
+    //   ["d",0,0,0,5,5,0,0,0,0],
+    //   ["e",0,0,0,0,5,5,0,0,0],
+    //   ["f",0,0,0,0,0,5,5,0,0],
+    //   ["g",0,0,0,0,0,0,5,5,0],
+    //   ["h",0,0,0,0,0,0,0,5,5],
+    //   ["i",5,0,0,0,0,0,0,0,5],
+    // ];
+
+
+
+    csv.forEach(function(item, i) {
+        if (i == 0) {
+            headers = item;
+        } else {
+            newSeries = {};
+            item.forEach(function(v, j) {
+                if (j == 0) {
+                    newSeries.className = v;
+                    newSeries.axes = [];
+                } else {
+                    newSeries.axes.push({ "axis": [headers[j]], "value": parseFloat(v) });
+                }
+            });
+            data.push(newSeries);
+        }
+    })
+
+    RadarChart.defaultConfig.radius = 3;
+    RadarChart.defaultConfig.w = w;
+    RadarChart.defaultConfig.h = h;
+
+    var mycfg = {
+        color: function(i) {
+            c = [
+                '1A1919',
+                '111111',
+                '3E3E3E',
+                '323232',
+                '424141',
+                '605E5E',
+                '7E7D7D',
+                '9E9E9E',
+                'CCCCCC',
+                '0C0C0C',
+            ];
+            return c[i];
+        },
+    }
+
+    RadarChart.draw("#chart-container", data, mycfg);
+    var divVal = document.getElementById('chart-container');
+}
+
+$.get("/api/asd97asdhasd87", function(data) {
+    showRadar(parceProfileData(data[0]));
+});
+</script>
 
 </html>

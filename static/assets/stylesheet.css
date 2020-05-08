@@ -4,7 +4,7 @@ html, body {
 }
 
 h1 {
-	margin: 8px 0 52px 0;
+	margin: 8px 0 64px 0;
 
 	font-family: 'GiorgioSansBold', sans-serif;
 	text-transform: uppercase;
@@ -27,8 +27,9 @@ ul, li {
 }
 
 #chart-container {
-	border: solid 1px;
+	/*border: solid 1px;*/
 	height: 320px;
+	margin-bottom: 64px;
 }
 
 #profile, .profile-date, #save-profile {
@@ -51,23 +52,10 @@ ul, li {
 	line-height: 15px;
 }
 
-/*.competence-ref {
-	margin-bottom: 20px;
-
-	color: #999E9C;
-	font-size: 12px;
-	line-height: 15px;	
-}*/
-
-/*.competence-grade {
-	font-size: 36px;
-	line-height: 46px;
-}*/
-
 .grade {
 	display: inline-block;
 	float: right;
-	margin-top: -6px;
+	margin-top: -5px;
 }
 
 .grade .competence-grade {
@@ -115,8 +103,8 @@ ul, li {
 }
 
 #profile li{
-	margin-bottom: 24px;
-	padding-bottom: 16px;
+	margin-bottom: 40px;
+	padding-bottom: 34px;
 
 	border-bottom: 1px solid rgba(255, 255, 255, 0.3);
 }
