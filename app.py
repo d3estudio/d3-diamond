@@ -23,16 +23,16 @@ def api(id):
     for f in sheet.get_all_records():
         if id == f["ID"]:
 
-            f["A"] = float(f["A"].replace(",", "."))
-            f["B"] = float(f["B"].replace(",", "."))
-            f["C"] = float(f["C"].replace(",", "."))
-            f["D"] = float(f["D"].replace(",", "."))
-            f["E"] = float(f["E"].replace(",", "."))
-            f["F"] = float(f["F"].replace(",", "."))
-            f["G"] = float(f["G"].replace(",", "."))
-            f["H"] = float(f["H"].replace(",", "."))
-            f["I"] = float(f["I"].replace(",", "."))
-            f["J"] = float(f["J"].replace(",", "."))
+            f["A"] = float(str(f["A"]).replace(",", "."))
+            f["B"] = float(str(f["B"]).replace(",", "."))
+            f["C"] = float(str(f["C"]).replace(",", "."))
+            f["D"] = float(str(f["D"]).replace(",", "."))
+            f["E"] = float(str(f["E"]).replace(",", "."))
+            f["F"] = float(str(f["F"]).replace(",", "."))
+            f["G"] = float(str(f["G"]).replace(",", "."))
+            f["H"] = float(str(f["H"]).replace(",", "."))
+            f["I"] = float(str(f["I"]).replace(",", "."))
+            f["J"] = float(str(f["J"]).replace(",", "."))
 
             f["CHANGE_A"] = float(str(f["CHANGE_A"]).replace(",", "."))
             f["CHANGE_B"] = float(str(f["CHANGE_B"]).replace(",", "."))
