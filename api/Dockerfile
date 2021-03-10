@@ -8,4 +8,4 @@ EXPOSE 8000
 
 WORKDIR /api
 
-CMD test -e /api/bin/diamond || go build /api -o /api/bin/diamond && /api/bin/diamond
+CMD test -e ./bin/diamond || go build -o ./bin/diamond . && ./bin/diamond

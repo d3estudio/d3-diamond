@@ -1,16 +1,18 @@
 package main
 
 import (
-    "net/http"
-    "log"
+    "github.com/Plankiton/SexPistol"
 )
 
 func main () {
-    http.
-    HandleFunc("/",
-    func(w http.ResponseWriter, r *http.Request) {
-        w.Write([]byte("Hello Mundo!!"))
+    router := sex.Pistol{}
+
+    router.
+    Add("get", "/{name}", nil, func(r sex.Request) ([]byte, int) {
+        return []byte(
+            "Hello, "+ r.PathVars["name"],
+        ), 200
     })
 
-    log.Fatal(http.ListenAndServe(":8000", nil))
+    router.Run("/", 8000)
 }

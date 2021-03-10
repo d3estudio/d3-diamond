@@ -133,4 +133,5 @@ dmypy.json
 tmp/*
 
 
-auth.json
+auth.jsondiamond
+diamond
