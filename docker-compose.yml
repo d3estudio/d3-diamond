@@ -11,6 +11,15 @@ services:
       - "5000"
     ports:
       - "80:5000"
+  db:
+    image: postgres
+    restart: always
+    env_file:
+      .env
+    expose:
+      - "5432"
+    ports:
+      - "5432:5432"
   api:
     build:
       context: ./api
