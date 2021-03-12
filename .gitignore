@@ -135,3 +135,5 @@ tmp/*
 
 auth.jsondiamond
 diamond
+*.db
+db

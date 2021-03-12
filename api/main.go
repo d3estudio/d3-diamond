@@ -11,7 +11,7 @@ func main () {
 
     if os.Getenv("DEBUG_MODE") == "true" {
         sex.Log("Entering on Debug mode, using sqlite database")
-        db, err = router.SignDB(con_str, sex.Sqlite,   // Connection string can be set by env DB_URI too
+        db, err = router.SignDB(":memory:", sex.Sqlite,   // Connection string can be set by env DB_URI too
         &User{}, &Token{}, &Role{}, &UserRole{})       // Models to create on database if not exists
     } else {
         sex.Log("Trying to connect to postgresql")
@@ -27,6 +27,8 @@ func main () {
 
     router.Auth = true
     router.
+
+    // Authentication routes
     Add(
         "post", "/login", sex.RouteConf {
             "need-auth": false,
@@ -37,8 +39,26 @@ func main () {
     ).
     Add(
         "post", "/logout", nil, LogOut,
+    ).
+
+    // User managment routes
+    Add(
+        "get", "/user/", nil, GetUserList,
+    ).
+    Add(
+        "post", "/user/", sex.RouteConf {
+            "need-auth": false,
+        }, CreateUser,
+    ).
+    Add(
+        "get", "/user/{id}", nil, GetUser,
+    ).
+    Add(
+        "post", "/user/{id}", nil, UpdateUser,
+    ).
+    Add(
+        "delete", "/user/{id}", nil, DeleteUser,
     )
 
-    test_user()
     router.Run("/", 8000)
 }
