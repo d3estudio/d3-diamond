@@ -21,13 +21,11 @@ func (token *Token) GetUser() (User, bool) {
     return user, ok
 }
 
-func (model *Token) Create() {
+func (model *Token) Create() bool {
     model.ModelType = sex.GetModelType(model)
 
     user := User{}
-    user.ID = model.UserId
-
-    if db.First(&user).Error == nil {
+    if db.First(&user, "id = ?", model.UserId).Error == nil {
         var order int64
         db.Find(model).Count(&order)
 
@@ -40,7 +38,10 @@ func (model *Token) Create() {
             ID := model.ID
             ModelType := model.ModelType
             sex.Log("Created", sex.ToLabel(ID, ModelType))
+            return true
         }
     }
+
+    return false
 }
 

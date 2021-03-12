@@ -3,7 +3,7 @@ import (
     "github.com/Plankiton/SexPistol"
 )
 
-func (model *Score) Create() {
+func (model *Score) Create() bool {
     if (model.ModelType == "") {
         model.ModelType = sex.GetModelType(model)
     }
@@ -12,32 +12,44 @@ func (model *Score) Create() {
         ID := model.ID
         ModelType := model.ModelType
         sex.Log("Created", sex.ToLabel(ID, ModelType))
+        return true
     }
+
+    return false
 }
 
-func (model *Score) Delete() {
+func (model *Score) Delete() bool {
     ID := model.ID
     ModelType := model.ModelType
 
     if sex.ModelCreate(model) == nil {
         sex.Log("Deleted", sex.ToLabel(ID, ModelType))
+        return true
     }
+
+    return false
 }
 
-func (model *Score) Save() {
+func (model *Score) Save() bool {
     ID := model.ID
     ModelType := model.ModelType
 
     if sex.ModelSave(model) == nil {
         sex.Log("Updated", sex.ToLabel(ID, ModelType))
+        return true
     }
+
+    return false
 }
 
-func (model *Score) Update(columns sex.Dict) {
+func (model *Score) Update(columns sex.Dict) bool {
     ID := model.ID
     ModelType := model.ModelType
 
     if sex.ModelUpdate(model, columns) == nil {
         sex.Log("Updated", sex.ToLabel(ID, ModelType))
+        return true
     }
+
+    return false
 }

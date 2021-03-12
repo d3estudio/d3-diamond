@@ -6,5 +6,7 @@ import (
 
 type Score struct {
     sex.Model
+    Name       string `json:"name"`
 }
+
 
