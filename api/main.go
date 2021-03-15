@@ -58,6 +58,25 @@ func main () {
     ).
     Add(
         "delete", "/user/{id}", nil, DeleteUser,
+    ).
+
+    // Role managment routes
+    Add(
+        "get", "/role/", nil, GetRoleList,
+    ).
+    Add(
+        "post", "/role/", sex.RouteConf {
+            "need-auth": false,
+        }, CreateRole,
+    ).
+    Add(
+        "get", "/role/{id}", nil, GetRole,
+    ).
+    Add(
+        "post", "/role/{id}", nil, UpdateRole,
+    ).
+    Add(
+        "delete", "/role/{id}", nil, DeleteRole,
     )
 
     router.Run("/", 8000)
