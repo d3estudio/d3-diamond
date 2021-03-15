@@ -62,7 +62,6 @@ func Verify(r sex.Request) (sex.Response, int) {
             sex.Log(msg)
             res := sex.Response {
                 Type: "Sucess",
-                Message: msg,
                 Data: user,
             }
 

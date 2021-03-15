@@ -12,7 +12,8 @@ import (
 
 func GetUser(r sex.Request) (sex.Response, int) {
     u := User {}
-    if db.First(&u, "id = ?", r.PathVars["id"]).Error != nil {
+    id, _ := sc.Atoi(r.PathVars["id"])
+    if db.First(&u, "id = ?", id).Error != nil {
         msg := fmt.Sprint("User not found")
         sex.Err(msg)
         return sex.Response {
@@ -24,7 +25,7 @@ func GetUser(r sex.Request) (sex.Response, int) {
     token := Token{}
     token.ID = r.Token
     if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, u) {
-        msg := "Authentication fail, permission denied"
+        msg := "Authentication fail, your user not exists or dont have permissions to acess this"
         sex.Err(msg)
         return sex.Response {
             Message: msg,
@@ -39,6 +40,17 @@ func GetUser(r sex.Request) (sex.Response, int) {
 }
 
 func CreateUser(r sex.Request) (sex.Response, int) {
+    token := Token{}
+    token.ID = r.Token
+    if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, nil) {
+        msg := "Authentication fail, logged user not found or dont have permissions to acess this"
+        sex.Err(msg)
+        return sex.Response {
+            Message: msg,
+            Type:    "Error",
+        }, 405
+    }
+
     if !sex.ValidateData(r.Data, sex.GenericJsonObj) {
         msg := fmt.Sprint("User create fail, data need to be a object")
         sex.Err(msg)
