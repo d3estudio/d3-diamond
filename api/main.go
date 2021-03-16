@@ -8,17 +8,26 @@ import (
 var con_str string = "host=localhost password=joaojoao dbname=d3diamond port=5432 sslmode=disable TimeZone=America/Araguaina"
 func main () {
     var router sex.Pistol
+    models := []interface{}{
+        &User{},
+        &Token{},
+        &Role{},
+        &UserRole{},
+        &Score{},
+        &ScoreType{},
+        &Avaluation{},
+    }
 
     if os.Getenv("DEBUG_MODE") == "true" {
         sex.Log("Entering on Debug mode, using sqlite database")
         db, err = router.SignDB(":memory:", sex.Sqlite,   // Connection string can be set by env DB_URI too
-        &User{}, &Token{}, &Role{}, &UserRole{})       // Models to create on database if not exists
+        models...)       // Models to create on database if not exists
 
         test_user()
     } else {
         sex.Log("Trying to connect to postgresql")
         db, err = router.SignDB(con_str, sex.Postgres, // Connection string can be set by env DB_URI too
-        &User{}, &Token{}, &Role{}, &UserRole{})       // Models to create on database if not exists
+        models...)       // Models to create on database if not exists
     }
 
     if db.Take(&Role{}).Error != nil {
@@ -36,6 +45,75 @@ func main () {
         founder.Name = "founder"
         founder.Desc = "Tem todas as permissões de admin, e pode mudar o role de qualquer usuário"
         founder.Create()
+    }
+
+    if db.Take(&ScoreType{}).Error != nil {
+        desbravamento := ScoreType{}
+        desbravamento.ID = "desbravamento"
+        desbravamento.Desc = "Abrir mata virgem com facão. Coragem para explorar fronteiras além das já mapeadas."
+        desbravamento.Create()
+
+        comprometimento := ScoreType{}
+        comprometimento.ID = "comprometimento"
+        comprometimento.Desc = "Honrar o compromisso. Absorver diferentes inteligências para crescer."
+        comprometimento.Create()
+
+        criatividade := ScoreType{}
+        criatividade.ID = "criatividade"
+        criatividade.Desc = "Sentir a sua veia criativa pulsar. Potência para criar com multidisciplinaridade e assim expandir soluções."
+        criatividade.Create()
+
+        adaptabilidade := ScoreType{}
+        adaptabilidade.ID = "adaptabilidade"
+        adaptabilidade.Desc = "N˜ão seja uma samambaia louca, seja um bambu. Conseguir operar em diferentes contextos e fluir."
+        adaptabilidade.Create()
+
+        contundencia := ScoreType{}
+        contundencia.ID = "contundência"
+        contundencia.Desc = "Quebrar o existe. Fôlego para questionar o existente, quebrar se necessário e recriar com confianca."
+        contundencia.Create()
+
+        excelencia := ScoreType{}
+        excelencia.ID = "excelência"
+        excelencia.Desc = "Busca constante para aperfeiçoar a paixão. Realização das tarefas com o nível de excelência dentro da sua fase."
+        excelencia.Create()
+
+        comunicação := ScoreType{}
+        comunicação.ID = "comunicação"
+        comunicação.Desc = "Não contar com telepatia. Prática da comunicação clara dentro do time."
+        comunicação.Create()
+
+        autonomia := ScoreType{}
+        autonomia.ID = "autonomia"
+        autonomia.Desc = "Ser independente. Assumir responsabilidades, manter-se informado e saber para onde o time está indo."
+        autonomia.Create()
+
+        realização := ScoreType{}
+        realização.ID = "realização"
+        realização.Desc = "Decolar e colocar na rua. Evoluir o projeto através da materialização das ideias criativas."
+        realização.Create()
+
+        maturidade_emocional := ScoreType{}
+        maturidade_emocional.ID = "maturidade emocional"
+        maturidade_emocional.Desc = "Tato com as pessoas e chamego com a comunidade. Aprendizados através do poder da escuta com os outros."
+        maturidade_emocional.Create()
+    }
+
+    if db.Take(&Token{}).Error != nil {
+        token := Token{}
+        token.ID = "3ae3c630a26b2695974a9bae2b2fd0492e9fc81f"
+        token.UserId = 1
+        token.Create()
+    }
+
+    if db.Take(&UserRole{}).Error != nil {
+        founder := Role{}
+        db.First(&founder, "name = ?", "founder")
+
+        root := UserRole{}
+        root.UserId = 1
+        root.RoleId = founder.ID
+        root.Create()
     }
 
     if err != nil {
@@ -108,6 +186,25 @@ func main () {
     ).
     Add(
         "get", "/role/{id}/users", nil, GetUserListByRole,
+    ).
+
+    // ScoreType managment routes
+    Add(
+        "get", "/score-type/", nil, GetScoreTypeList,
+    ).
+    Add(
+        "post", "/score-type/", sex.RouteConf {
+            "need-auth": false,
+        }, CreateScoreType,
+    ).
+    Add(
+        "get", "/score-type/{id}", nil, GetScoreType,
+    ).
+    Add(
+        "post", "/score-type/{id}", nil, UpdateScoreType,
+    ).
+    Add(
+        "delete", "/score-type/{id}", nil, DeleteScoreType,
     )
 
     router.Run("/", 8000)

@@ -22,7 +22,7 @@ func (model *Score) Delete() bool {
     ID := model.ID
     ModelType := model.ModelType
 
-    if sex.ModelCreate(model) == nil {
+    if sex.ModelDelete(model) == nil {
         sex.Log("Deleted", sex.ToLabel(ID, ModelType))
         return true
     }
@@ -54,7 +54,7 @@ func (model *Score) Update(columns sex.Dict) bool {
     return false
 }
 
-func (model *UserScore) Create() bool {
+func (model *ScoreType) Create() bool {
     if (model.ModelType == "") {
         model.ModelType = sex.GetModelType(model)
     }
@@ -69,11 +69,11 @@ func (model *UserScore) Create() bool {
     return false
 }
 
-func (model *UserScore) Delete() bool {
+func (model *ScoreType) Delete() bool {
     ID := model.ID
     ModelType := model.ModelType
 
-    if sex.ModelCreate(model) == nil {
+    if sex.ModelDelete(model) == nil {
         sex.Log("Deleted", sex.ToLabel(ID, ModelType))
         return true
     }
@@ -81,7 +81,7 @@ func (model *UserScore) Delete() bool {
     return false
 }
 
-func (model *UserScore) Save() bool {
+func (model *ScoreType) Save() bool {
     ID := model.ID
     ModelType := model.ModelType
 
@@ -93,7 +93,7 @@ func (model *UserScore) Save() bool {
     return false
 }
 
-func (model *UserScore) Update(columns sex.Dict) bool {
+func (model *ScoreType) Update(columns sex.Dict) bool {
     ID := model.ID
     ModelType := model.ModelType
 
