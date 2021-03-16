@@ -31,7 +31,7 @@ func (model *Token) Create() bool {
 
         model.UserId = user.ID
         model.ID = sex.ToHash(fmt.Sprintf(
-            "%d;%d;%s;%s;%s", order, user.ID, user.Name, user.Email, user.Phone,
+            "%d;%d;%s;%s", order, user.ID, user.Name, user.Email,
         ))
 
         if sex.ModelCreate(model) == nil {

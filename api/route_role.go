@@ -150,41 +150,6 @@ func DeleteRole(r sex.Request) (sex.Response, int) {
     }, 200
 }
 
-func RoleUnsignUser(r sex.Request) (sex.Response, int) {
-    token := Token{}
-    token.ID = r.Token
-    if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, nil) {
-        msg := "Authentication fail, your user not exists or dont have permissions to acess this"
-        sex.Err(msg)
-        return sex.Response {
-            Message: msg,
-            Type:    "Error",
-        }, 405
-    }
-
-    user := User{}
-    if db.First(&user, "id = ?", r.PathVars["uid"]).Error != nil {
-        return sex.Response{
-            Type: "Error",
-            Message: "User not found",
-        }, 404
-    }
-
-    role := Role{}
-    if db.First(&role, "id = ?", r.PathVars["rid"]).Error != nil {
-        return sex.Response{
-            Type: "Error",
-            Message: "Role not found",
-        }, 404
-    }
-
-    user, role = role.Unsign(user)
-    return sex.Response {
-        Type: "Sucess",
-        Message: fmt.Sprint(user.Name, " Unsigned to ", role.Name),
-    }, 200
-}
-
 func RoleSignUser(r sex.Request) (sex.Response, int) {
     token := Token{}
     token.ID = r.Token
@@ -214,10 +179,62 @@ func RoleSignUser(r sex.Request) (sex.Response, int) {
     }
 
     user, role = role.Sign(user)
+    if role.ID != 0 {
+        return sex.Response {
+            Type: "Sucess",
+            Message: fmt.Sprint(user.Name, " Signed to ", role.Name),
+        }, 200
+    }
+
+    msg := "This user already signed to this role"
+    sex.Err(msg)
     return sex.Response {
         Type: "Sucess",
-        Message: fmt.Sprint(user.Name, " Signed to ", role.Name),
-    }, 200
+        Message: "This user isn't signed to this role",
+    }, 500
+}
+
+func RoleUnsignUser(r sex.Request) (sex.Response, int) {
+    token := Token{}
+    token.ID = r.Token
+    if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, nil) {
+        msg := "Authentication fail, your user not exists or dont have permissions to acess this"
+        sex.Err(msg)
+        return sex.Response {
+            Message: msg,
+            Type:    "Error",
+        }, 405
+    }
+
+    user := User{}
+    if db.First(&user, "id = ?", r.PathVars["uid"]).Error != nil {
+        return sex.Response{
+            Type: "Error",
+            Message: "User not found",
+        }, 404
+    }
+
+    role := Role{}
+    if db.First(&role, "id = ?", r.PathVars["rid"]).Error != nil {
+        return sex.Response{
+            Type: "Error",
+            Message: "Role not found",
+        }, 404
+    }
+
+    user, role = role.Unsign(user)
+    if role.ID != 0 {
+        return sex.Response {
+            Type: "Sucess",
+            Message: fmt.Sprint(user.Name, " Unsigned to ", role.Name),
+        }, 200
+    }
+
+    sex.Err("This user isn't signed to this role")
+    return sex.Response {
+        Type: "Sucess",
+        Message: "This user isn't signed to this role",
+    }, 500
 }
 
 func GetUserListByRole(r sex.Request) (sex.Response, int) {
@@ -254,44 +271,6 @@ func GetUserListByRole(r sex.Request) (sex.Response, int) {
     return sex.Response{
         Type: "Sucess",
         Data: user_list,
-    }, 200
-}
-
-
-func GetRoleListByUser(r sex.Request) (sex.Response, int) {
-    user := User{}
-    if (db.First(&user, "id = ?", r.PathVars["id"]).Error != nil) {
-        return sex.Response{
-            Type: "Error",
-            Message: "User not found",
-        }, 404
-    }
-
-    token := Token{}
-    token.ID = r.Token
-    if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, user) {
-        msg := "Authentication fail, permission denied"
-        sex.Err(msg)
-        return sex.Response {
-            Message: msg,
-            Type:    "Error",
-        }, 405
-    }
-
-    limit, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("l"))
-    page, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("p"))
-    r.Conf["query"].(url.Values).Del("l")
-    r.Conf["query"].(url.Values).Del("p")
-
-    query := r.Conf["query"].(url.Values).Encode()
-    query = str.ReplaceAll(query, "&", " AND ")
-    query = str.ReplaceAll(query, "|", " OR ")
-
-    role_list := user.QueryRoles(page, limit, query)
-
-    return sex.Response{
-        Type: "Sucess",
-        Data: role_list,
     }, 200
 }
 

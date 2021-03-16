@@ -13,10 +13,29 @@ func main () {
         sex.Log("Entering on Debug mode, using sqlite database")
         db, err = router.SignDB(":memory:", sex.Sqlite,   // Connection string can be set by env DB_URI too
         &User{}, &Token{}, &Role{}, &UserRole{})       // Models to create on database if not exists
+
+        test_user()
     } else {
         sex.Log("Trying to connect to postgresql")
         db, err = router.SignDB(con_str, sex.Postgres, // Connection string can be set by env DB_URI too
         &User{}, &Token{}, &Role{}, &UserRole{})       // Models to create on database if not exists
+    }
+
+    if db.Take(&Role{}).Error != nil {
+        user := Role{}
+        user.Name = "user"
+        user.Desc = "Pode visualizar os próprios resultados e avaliar os colegas"
+        user.Create()
+
+        adm := Role{}
+        adm.Name = "admin"
+        adm.Desc = "Pode fazer oque os usuários podem, além de Criar/Editar/Apagar ou gerar relatórios em CSV sobre os usuários"
+        adm.Create()
+
+        founder := Role{}
+        founder.Name = "founder"
+        founder.Desc = "Tem todas as permissões de admin, e pode mudar o role de qualquer usuário"
+        founder.Create()
     }
 
     if err != nil {
@@ -59,6 +78,9 @@ func main () {
     Add(
         "delete", "/user/{id}", nil, DeleteUser,
     ).
+    Add(
+        "get", "/user/{id}/roles", nil, GetRoleListByUser,
+    ).
 
     // Role managment routes
     Add(
@@ -77,6 +99,15 @@ func main () {
     ).
     Add(
         "delete", "/role/{id}", nil, DeleteRole,
+    ).
+    Add(
+        "post", "/role/{rid}/sign/{uid}", nil, RoleSignUser,
+    ).
+    Add(
+        "post", "/role/{rid}/unsign/{uid}", nil, RoleUnsignUser,
+    ).
+    Add(
+        "get", "/role/{id}/users", nil, GetUserListByRole,
     )
 
     router.Run("/", 8000)

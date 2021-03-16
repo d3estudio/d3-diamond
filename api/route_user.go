@@ -236,3 +236,42 @@ func GetUserList(r sex.Request) (sex.Response, int) {
         Data: query_response,
     }, 200
 }
+
+func GetRoleListByUser(r sex.Request) (sex.Response, int) {
+    user := User{}
+    if (db.First(&user, "id = ?", r.PathVars["id"]).Error != nil) {
+        return sex.Response{
+            Type: "Error",
+            Message: "User not found",
+        }, 404
+    }
+
+    token := Token{}
+    token.ID = r.Token
+    if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, user) {
+        msg := "Authentication fail, permission denied"
+        sex.Err(msg)
+        return sex.Response {
+            Message: msg,
+            Type:    "Error",
+        }, 405
+    }
+
+    limit, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("l"))
+    page, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("p"))
+    r.Conf["query"].(url.Values).Del("l")
+    r.Conf["query"].(url.Values).Del("p")
+
+    query := r.Conf["query"].(url.Values).Encode()
+    query = str.ReplaceAll(query, "&", " AND ")
+    query = str.ReplaceAll(query, "|", " OR ")
+
+    sex.SuperPut(limit, page)
+    role_list := user.QueryRoles(page, limit, query)
+
+    return sex.Response{
+        Type: "Sucess",
+        Data: role_list,
+    }, 200
+}
+

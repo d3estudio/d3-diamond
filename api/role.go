@@ -13,37 +13,34 @@ func (self UserRole) Sign(user User, role Role) (User, Role) {
     self.UserId = user.ID
     self.RoleId = role.ID
 
-    self.Create()
-    sex.Log("Linked", sex.ToLabel(user.ID, user.ModelType), user.Name, "to", sex.ToLabel(role.ID, role.ModelType), role.Name)
+    if self.Create() {
+        sex.Log("Linked", sex.ToLabel(user.ID, user.ModelType), user.Name, "to", sex.ToLabel(role.ID, role.ModelType), role.Name)
+        return user, role
+    }
 
-    return user, role
-}
-
-func (self UserRole) Unsign(user User, role Role) (User, Role) {
-    self.UserId = user.ID
-    self.RoleId = role.ID
-
-    self.Delete()
-    sex.Log("Unlinked", sex.ToLabel(user.ID, user.ModelType), user.Name, "from", sex.ToLabel(role.ID, role.ModelType), role.Name)
-
-    return user, role
+    return User{}, Role{}
 }
 
 func (self Role) Sign(user User) (User, Role) {
     link := UserRole{}
-    user, self = link.Sign(user, self)
+    if db.First(&link, "user_id = ? AND role_id = ?", user.ID, self.ID).Error != nil {
+        u, r := link.Sign(user, self)
+        return u, r
+    }
 
-    return user, self
+    return User{}, Role{}
 }
 
 func (self Role) Unsign(user User) (User, Role) {
     link := UserRole{}
     e := db.Where("user_id = ? AND role_id = ?", user.ID, self.ID).First(&link)
     if e.Error == nil {
-        user, self = link.Unsign(user, self)
+        if link.Delete() {
+            return user, self
+        }
     }
 
-    return user, self
+    return User{}, Role{}
 }
 
 func (self *Role) GetUsers(page int, limit int) []User {
@@ -51,7 +48,8 @@ func (self *Role) GetUsers(page int, limit int) []User {
     if e.Error == nil {
         user_list := []uint{}
         users := []User{}
-        e := db.Raw("SELECT u.id FROM users u INNER JOIN user_roles ur INNER JOIN roles r ON ur.role_id = r.id AND ur.user_id = u.id AND r.id = ?", self.ID)
+        e := db.Raw("SELECT u.id FROM users u JOIN user_roles ur ON u.id = ur.user_id JOIN roles r on ur.role_id = r.id AND r.id = ?", self.ID)
+
         if limit > 0 && page > 0 {
             e = e.Offset((page-1)*limit).Limit(limit)
         }
@@ -79,7 +77,8 @@ func (self *User) GetRoles(page int, limit int) []Role {
     if e.Error == nil {
         role_list := []uint{}
         roles := []Role{}
-        e := db.Raw("SELECT r.id FROM roles r INNER JOIN user_roles ur INNER JOIN users u ON ur.role_id = r.id AND ur.user_id = u.id AND u.id = ?", self.ID)
+        e := db.Raw("SELECT r.id FROM roles r JOIN user_roles ur ON r.id = ur.role_id JOIN users u ON u.id = ur.user_id AND u.id = ?", self.ID)
+
         if limit > 0 && page > 0 {
             e = e.Offset((page-1)*limit).Limit(limit)
         }
@@ -102,7 +101,7 @@ func (self *Role) QueryUsers(page int, limit int, query ...interface{}) []User {
     if e.Error == nil {
         user_list := []uint{}
         users := []User{}
-        e := db.Raw("SELECT u.id FROM users u INNER JOIN user_roles ur INNER JOIN roles r ON ur.role_id = r.id AND ur.user_id = u.id AND r.id = ?", self.ID)
+        e := db.Raw("SELECT u.id FROM users u JOIN user_roles ur ON u.id = ur.user_id JOIN roles r on ur.role_id = r.id AND r.id = ?", self.ID)
         if limit > 0 && page > 0 {
             e = e.Offset((page-1)*limit).Limit(limit)
         }
@@ -126,7 +125,7 @@ func (self *User) QueryRoles(page int, limit int, query...interface{}) []Role {
     if e.Error == nil {
         role_list := []uint{}
         roles := []Role{}
-        e := db.Raw("SELECT r.id FROM roles r INNER JOIN user_roles ur INNER JOIN users u ON ur.role_id = r.id AND ur.user_id = u.id AND u.id = ?", self.ID)
+        e := db.Raw("SELECT r.id FROM roles r JOIN user_roles ur ON r.id = ur.role_id JOIN users u ON u.id = ur.user_id AND u.id = ?", self.ID)
         if limit > 0 && page > 0 {
             e = e.Offset((page-1)*limit).Limit(limit)
         }
