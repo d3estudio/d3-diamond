@@ -4,6 +4,7 @@ import (
 	"fmt"
 
   "net/url"
+  "net/http"
   sc "strconv"
   str "strings"
 
@@ -263,15 +264,32 @@ func GetRoleListByUser(r sex.Request) (sex.Response, int) {
 
     limit, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("l"))
     page, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("p"))
-    r.Conf["query"].(url.Values).Del("l")
-    r.Conf["query"].(url.Values).Del("p")
 
-    query := r.Conf["query"].(url.Values).Encode()
-    query = str.ReplaceAll(query, "&", " AND ")
-    query = str.ReplaceAll(query, "|", " OR ")
+    query := r.Conf["headers"].(http.Header).Get("Query")
+    query = str.ReplaceAll(query, "&&", " AND ")
+    query = str.ReplaceAll(query, "||", " OR ")
 
-    sex.SuperPut(limit, page)
-    role_list := user.QueryRoles(page, limit, query)
+    if query != "" {
+        query = " AND "+query
+    }
+
+    role_list := []map[string]interface{}{}
+
+    offset := (page - 1) * limit
+    e := db.Table("roles r").Select("r.*").
+    Order("r.created_at desc, r.updated_at, r.id").
+    Joins("join user_roles l").
+    Joins("join users u on l.user_id = u.id AND l.role_id = r.id AND u.id = ?"+ query, user.ID).
+    Offset(offset).Limit(limit).
+    Find(&role_list).Error
+    if e != nil {
+        msg := "Query error, query \""+r.Conf["headers"].(http.Header).Get("Query")+"\" is not valid"
+        sex.Err(msg, e)
+        return sex.Response {
+            Message: msg,
+            Type:    "Error",
+        }, 400
+    }
 
     return sex.Response{
         Type: "Sucess",

@@ -4,6 +4,7 @@ import (
     "fmt"
 
     "net/url"
+    "net/http"
     sc "strconv"
     str "strings"
     "github.com/Plankiton/SexPistol"
@@ -259,40 +260,68 @@ func GetUserListByRole(r sex.Request) (sex.Response, int) {
 
     limit, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("l"))
     page, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("p"))
-    r.Conf["query"].(url.Values).Del("l")
-    r.Conf["query"].(url.Values).Del("p")
 
-    query := r.Conf["query"].(url.Values).Encode()
-    query = str.ReplaceAll(query, "&", " AND ")
-    query = str.ReplaceAll(query, "|", " OR ")
+    query := r.Conf["headers"].(http.Header).Get("Query")
+    query = str.ReplaceAll(query, "&&", " AND ")
+    query = str.ReplaceAll(query, "||", " OR ")
 
-    user_list := role.QueryUsers(page, limit, query)
+    if query != "" {
+        query = " AND "+query
+    }
+
+    role_list := []map[string]interface{}{}
+
+    offset := (page - 1) * limit
+    e := db.Table("users u").Select("u.name, u.genre, u.updated_at, u.created_at, u.email").
+    Order("r.created_at desc, r.updated_at, r.id").
+    Joins("join user_roles l").
+    Joins("join roles r on l.user_id = u.id AND l.role_id = r.id AND r.id = ?"+ query, role.ID).
+    Offset(offset).Limit(limit).
+    Find(&role_list).Error
+    if e != nil {
+        msg := "Query error, query \""+r.Conf["headers"].(http.Header).Get("Query")+"\" is not valid"
+        sex.Err(msg, e)
+        return sex.Response {
+            Message: msg,
+            Type:    "Error",
+        }, 400
+    }
 
     return sex.Response{
         Type: "Sucess",
-        Data: user_list,
+        Data: role_list,
     }, 200
+
 }
 
 func GetRoleList(r sex.Request) (sex.Response, int) {
     limit, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("l"))
     page, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("p"))
-    r.Conf["query"].(url.Values).Del("l")
-    r.Conf["query"].(url.Values).Del("p")
 
-    query := r.Conf["query"].(url.Values).Encode()
-    query = str.ReplaceAll(query, "&", " AND ")
-    query = str.ReplaceAll(query, "|", " OR ")
+    query := r.Conf["headers"].(http.Header).Get("Query")
+    query = str.ReplaceAll(query, "&&", " AND ")
+    query = str.ReplaceAll(query, "||", " OR ")
 
-    role_list := []Role{}
+    if query != "" {
+        query = " AND "+query
+    }
+
+    role_list := []map[string]interface{}{}
+
     offset := (page - 1) * limit
-    e := db.Offset(offset).Limit(limit).Order("created_at desc, updated_at, id").Find(&role_list, query)
-
-    if e.Error != nil {
-        return sex.Response{
-            Type: "Error",
-            Message: "Error on creating of profile on database",
-        }, 500
+    e := db.Table("roles r").Select("r.*").
+    Order("r.created_at desc, r.updated_at, r.id").
+    Joins("join user_roles l").
+    Joins("join users u on l.user_id = u.id AND l.role_id = r.id"+ query).
+    Offset(offset).Limit(limit).
+    Find(&role_list).Error
+    if e != nil {
+        msg := "Query error, query \""+r.Conf["headers"].(http.Header).Get("Query")+"\" is not valid"
+        sex.Err(msg, e)
+        return sex.Response {
+            Message: msg,
+            Type:    "Error",
+        }, 400
     }
 
     return sex.Response{
