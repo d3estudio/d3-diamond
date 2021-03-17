@@ -2,6 +2,11 @@ package main
 
 import (
     "fmt"
+
+    "net/url"
+    "net/http"
+    sc "strconv"
+    str "strings"
     "github.com/Plankiton/SexPistol"
 )
 
@@ -157,17 +162,8 @@ func UpdateScore(r sex.Request) (sex.Response, int) {
     token := Token{}
     token.ID = r.Token
     curr, ok := (token).GetUser()
-    if !ok {
-        msg := "Authentication fail, your user not exists"
-        sex.Err(msg)
-        return sex.Response {
-            Message: msg,
-            Type:    "Error",
-        }, 405
-    }
-
-    if !CheckPermissions(curr, user) {
-        msg := "Authentication fail, you dont have permissions to acess this"
+    if !ok || !CheckPermissions(curr, user) {
+        msg := "Authentication fail, your user not exists or dont have permissions to acess this"
         sex.Err(msg)
         return sex.Response {
             Message: msg,
@@ -279,14 +275,6 @@ func GetScoreList(r sex.Request) (sex.Response, int) {
             Type:    "Error",
         }, 400
     }
-    if !sex.ValidateData(r.Data, sex.GenericJsonObj){
-        msg := fmt.Sprint("Score create fail, data need to be a object")
-        sex.Err(msg)
-        return sex.Response {
-            Message: msg,
-            Type:    "Error",
-        }, 400
-    }
 
     receiver := User{}
     if db.First(&receiver, "id = ?", r.PathVars["id"]).Error != nil {
@@ -301,8 +289,8 @@ func GetScoreList(r sex.Request) (sex.Response, int) {
     token := Token{}
     token.ID = r.Token
     curr, ok := (token).GetUser()
-    if !ok {
-        msg := "Authentication fail, your user not exists"
+    if !ok || !CheckPermissions(curr, receiver) {
+        msg := "Authentication fail, your user not exists or dont have permissions to acess this"
         sex.Err(msg)
         return sex.Response {
             Message: msg,
@@ -310,25 +298,33 @@ func GetScoreList(r sex.Request) (sex.Response, int) {
         }, 405
     }
 
-    if curr.ID == receiver.ID {
-        msg := fmt.Sprint("Score create fail, You can't make a self-avaluation")
-        sex.Err(msg)
+    limit, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("l"))
+    page, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("p"))
+
+    query := r.Conf["headers"].(http.Header).Get("Query")
+    query = str.ReplaceAll(query, "&&", " AND ")
+    query = str.ReplaceAll(query, "||", " OR ")
+
+    if query != "" {
+        query = " AND "+query
+    }
+
+    score_list := []map[string]interface{}{}
+
+    offset := (page - 1) * limit
+    e := db.Table("scores s").Select("s.*").
+    Order("s.created_at desc, s.updated_at, s.id").
+    Joins("join avaluations a").
+    Joins("join users u on a.user_id = u.id AND u.id = ? "+ query, receiver.ID).
+    Offset(offset).Limit(limit).
+    Find(&score_list).Error
+    if e != nil {
+        msg := "Query error, query \""+r.Conf["headers"].(http.Header).Get("Query")+"\" is not valid"
+        sex.Err(msg, e)
         return sex.Response {
             Message: msg,
             Type:    "Error",
         }, 400
-    }
-
-    aval := curr.CreateAvaluation(receiver)
-
-    score_list := []Score{}
-    if db.Find(&score_list, "aval_id = ?", aval.ID).Error == nil {
-        msg := fmt.Sprint("Score create fail, Score already exists")
-        sex.Err(msg)
-        return sex.Response {
-            Message: msg,
-            Type:    "Error",
-        }, 500
     }
 
     return sex.Response {

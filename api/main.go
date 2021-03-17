@@ -219,9 +219,10 @@ func main () {
         "post", "/score/{id}", nil, UpdateScore,
     ).
     Add(
-        "post", "/user/{id}/score/", sex.RouteConf {
-            "need-auth": false,
-        }, CreateScore,
+        "post", "/user/{id}/score/", nil, CreateScore,
+    ).
+    Add(
+        "get", "/user/{id}/scores/", nil, GetScoreList,
     )
 
     router.Run("/", 8000)

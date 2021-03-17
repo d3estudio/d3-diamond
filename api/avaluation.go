@@ -18,10 +18,13 @@ func (self User) CreateAvaluation(user User) Avaluation {
 
 func (self *Avaluation) Sign(receiver User, sender User) error {
     now := time.Now()
-    y, m, d := now.Date()
-    date := time.Date(y, m, d, 0, 0, 0, 0, now.Location()).String()
+    y, m, _ := now.Date()
+    dt := time.Date(y, m, 1, 0, 0, 0, 0, now.Location())
+    date := dt.String()
+    dateend := dt.AddDate(0, 1, 0).String()
 
-    e := db.First(self, "user_id = ? AND sender_id = ? AND created_at >= ?", receiver.ID, sender.ID, date[:10])
+    e := db.First(self, "user_id = ? AND sender_id = ? AND created_at BETWEEN ? AND ?", receiver.ID, sender.ID,
+    date[:10], dateend[:10])
     if e.Error != nil {
         self.UserId = receiver.ID
         self.SenderId = sender.ID
