@@ -98,6 +98,10 @@ func CreateUser(r sex.Request) (sex.Response, int) {
     user.SetPass(data["pass"].(string))
     user.Create()
 
+    role := Role{}
+    db.First(&role, "name = ?", "user")
+    role.Sign(user)
+
     return sex.Response {
         Type: "Sucess",
         Data: user,

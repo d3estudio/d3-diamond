@@ -78,20 +78,20 @@ func main () {
         excelencia.Desc = "Busca constante para aperfeiçoar a paixão. Realização das tarefas com o nível de excelência dentro da sua fase."
         excelencia.Create()
 
-        comunicação := ScoreType{}
-        comunicação.ID = "comunicação"
-        comunicação.Desc = "Não contar com telepatia. Prática da comunicação clara dentro do time."
-        comunicação.Create()
+        comunicacao := ScoreType{}
+        comunicacao.ID = "comunicação"
+        comunicacao.Desc = "Não contar com telepatia. Prática da comunicação clara dentro do time."
+        comunicacao.Create()
 
         autonomia := ScoreType{}
         autonomia.ID = "autonomia"
         autonomia.Desc = "Ser independente. Assumir responsabilidades, manter-se informado e saber para onde o time está indo."
         autonomia.Create()
 
-        realização := ScoreType{}
-        realização.ID = "realização"
-        realização.Desc = "Decolar e colocar na rua. Evoluir o projeto através da materialização das ideias criativas."
-        realização.Create()
+        realizacao := ScoreType{}
+        realizacao.ID = "realização"
+        realizacao.Desc = "Decolar e colocar na rua. Evoluir o projeto através da materialização das ideias criativas."
+        realizacao.Create()
 
         maturidade_emocional := ScoreType{}
         maturidade_emocional.ID = "maturidade emocional"
@@ -101,9 +101,10 @@ func main () {
 
     if db.Take(&Token{}).Error != nil {
         token := Token{}
-        token.ID = "3ae3c630a26b2695974a9bae2b2fd0492e9fc81f"
         token.UserId = 1
         token.Create()
+        token.ID = "3ae3c630a26b2695974a9bae2b2fd0492e9fc81f"
+        token.Save()
     }
 
     if db.Take(&UserRole{}).Error != nil {
@@ -205,6 +206,22 @@ func main () {
     ).
     Add(
         "delete", "/score-type/{id}", nil, DeleteScoreType,
+    ).
+
+    // Score managment routes
+    Add(
+        "get", "/score/{id}", nil, GetScore,
+    ).
+    Add(
+        "post", "/score/{id}", nil, DeleteScore,
+    ).
+    Add(
+        "post", "/score/{id}", nil, UpdateScore,
+    ).
+    Add(
+        "post", "/user/{id}/score/", sex.RouteConf {
+            "need-auth": false,
+        }, CreateScore,
     )
 
     router.Run("/", 8000)

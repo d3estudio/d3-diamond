@@ -4,7 +4,7 @@ import "github.com/Plankiton/SexPistol"
 type Score struct {
     sex.Model
     AvalId     uint    `json:"-"`
-    TypeId     string  `json:"field,omitempty"`
+    TypeId     string  `json:"name,omitempty"`
     Value      float64 `json:"value,omitempty"`
 }
 
