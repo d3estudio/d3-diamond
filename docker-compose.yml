@@ -1,6 +1,6 @@
 version: '2'
 services:
-  feedback:
+  app:
     build:
       context: .
     volumes:
@@ -11,6 +11,8 @@ services:
       - "5000"
     ports:
       - "80:5000"
+    links:
+      - "api:api"
   db:
     image: postgres
     restart: always
@@ -30,3 +32,5 @@ services:
       - "8000"
     ports:
       - "8000:8000"
+    links:
+      - "db:database"
