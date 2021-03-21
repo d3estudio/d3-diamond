@@ -112,6 +112,20 @@ func CreateScore(r sex.Request) (sex.Response, int) {
     }
 
     if score.Create() {
+        ended_score := Score {}
+        if db.First(&ended_score, "aval_id = ? AND type_id = ? AND ended = true", aval.ID, data["name"]).Error == nil {
+            ended_score.Value += score.Value
+            ended_score.Total ++
+
+            ended_score.Save()
+        } else {
+            ended_score.Value = score.Value
+            ended_score.Total = 1
+            ended_score.Ended = true
+
+            ender_score.Create()
+        }
+
         return sex.Response {
             Type: "Sucess",
             Data: score,
@@ -316,6 +330,74 @@ func GetScoreList(r sex.Request) (sex.Response, int) {
     Order("s.created_at desc, s.updated_at, s.id").
     Joins("join avaluations a").
     Joins("join users u on a.user_id = u.id AND u.id = ? "+ query, receiver.ID).
+    Offset(offset).Limit(limit).
+    Find(&score_list).Error
+    if e != nil {
+        msg := "Query error, query \""+r.Conf["headers"].(http.Header).Get("Query")+"\" is not valid"
+        sex.Err(msg, e)
+        return sex.Response {
+            Message: msg,
+            Type:    "Error",
+        }, 400
+    }
+
+    return sex.Response {
+        Type: "Sucess",
+        Data: score_list,
+    }, 200
+}
+
+func GetEndedScoreList(r sex.Request) (sex.Response, int) {
+    if _, e := r.PathVars["id"]; !e {
+        msg := fmt.Sprint("Score create fail, where is \"id\" path variable? neede to be \"", "/", r.Conf["path-template"],"\"")
+        sex.Err(msg)
+        return sex.Response {
+            Message: msg,
+            Type:    "Error",
+        }, 400
+    }
+
+    receiver := User{}
+    if db.First(&receiver, "id = ?", r.PathVars["id"]).Error != nil {
+        msg := fmt.Sprint("Score create fail, user not found")
+        sex.Err(msg)
+        return sex.Response {
+            Message: msg,
+            Type:    "Error",
+        }, 404
+    }
+
+    token := Token{}
+    token.ID = r.Token
+    curr, ok := (token).GetUser()
+    if !ok || !CheckPermissions(curr, receiver) {
+        msg := "Authentication fail, your user not exists or dont have permissions to acess this"
+        sex.Err(msg)
+        return sex.Response {
+            Message: msg,
+            Type:    "Error",
+        }, 405
+    }
+
+    limit, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("l"))
+    page, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("p"))
+
+    query := r.Conf["headers"].(http.Header).Get("Query")
+    query = str.ReplaceAll(query, "&&", " AND ")
+    query = str.ReplaceAll(query, "||", " OR ")
+
+    if query != "" {
+        query = " AND "+query
+    }
+
+    aval := GetLastAval(receiver.ID)
+    score_list := []map[string]interface{}{}
+
+    offset := (page - 1) * limit
+    e := db.Table("scores s").Select("s.*").
+    Order("s.created_at desc, s.updated_at, s.id").
+    Joins("join avaluations a").
+    Joins("join users u on a.user_id = u.id AND u.id = ? AND s.ended = true AND a.id = ?"+ query, receiver.ID, aval.ID).
     Offset(offset).Limit(limit).
     Find(&score_list).Error
     if e != nil {

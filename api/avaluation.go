@@ -16,6 +16,23 @@ func (self User) CreateAvaluation(user User) Avaluation {
     return link
 }
 
+func GetLastAval(receiver uint) Avaluation {
+    now := time.Now()
+    y, m, _ := now.Date()
+    dt := time.Date(y, m, 1, 0, 0, 0, 0, now.Location())
+    date := dt.String()
+    dateend := dt.AddDate(0, 1, 0).String()
+
+    link := Avaluation{}
+    e := db.First(&link, "user_id AND created_at BETWEEN ? AND ?", receiver,
+    date[:10], dateend[:10])
+    if e.Error != nil {
+        return Avaluation{}
+    }
+
+    return link
+}
+
 func (self *Avaluation) Sign(receiver User, sender User) error {
     now := time.Now()
     y, m, _ := now.Date()

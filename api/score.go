@@ -7,6 +7,7 @@ type Score struct {
     TypeId     string    `json:"name,omitempty"`
     Value      float64   `json:"value,omitempty"`
     Ended      bool      `json:"-"`
+    Total      int       `json:"total,omitempty"`
 }
 
 type ScoreType struct {
