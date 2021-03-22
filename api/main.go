@@ -15,7 +15,6 @@ func main () {
         &UserRole{},
         &Score{},
         &ScoreType{},
-        &Avaluation{},
     }
 
     if os.Getenv("DEBUG_MODE") == "true" {
@@ -210,6 +209,12 @@ func main () {
 
     // Score managment routes
     Add(
+        "post", "/user/{id}/score/", nil, CreateScore,
+    ).Add(
+        "get", "/user/{id}/scores/", nil, GetScoreList,
+    ).
+
+    Add(
         "get", "/score/{id}", nil, GetScore,
     ).
     Add(
@@ -217,12 +222,6 @@ func main () {
     ).
     Add(
         "post", "/score/{id}", nil, UpdateScore,
-    ).
-    Add(
-        "post", "/user/{id}/score/", nil, CreateScore,
-    ).
-    Add(
-        "get", "/user/{id}/scores/", nil, GetScoreList,
     )
 
     router.Run("/", 8000)
