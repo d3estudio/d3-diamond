@@ -1,6 +1,7 @@
 package main
 import (
     "fmt"
+    "time"
     "github.com/Plankiton/SexPistol"
 )
 
@@ -31,7 +32,7 @@ func (model *Token) Create() bool {
 
         model.UserId = user.ID
         model.ID = sex.ToHash(fmt.Sprintf(
-            "%d;%d;%s;%s", order, user.ID, user.Name, user.Email,
+            "%d;%d;%s;%s;%s", order, user.ID, user.Name, user.Email, time.Now().String(),
         ))
 
         if sex.ModelCreate(model) == nil {

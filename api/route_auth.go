@@ -50,7 +50,7 @@ func LogIn(r sex.Request) (sex.Response, int) {
         Type:    "Error",
     }
     res.SetCookie("token", r.Token, time.Hour*24*360*10, r)
-    return res, 405
+    return res, 403
 }
 
 func Verify(r sex.Request) (sex.Response, int) {
