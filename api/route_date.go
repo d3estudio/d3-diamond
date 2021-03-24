@@ -32,6 +32,7 @@ func CreateDate(r sex.Request) (sex.Response, int) {
 
     UserId, _ := str.Atoi(r.PathVars["id"])
     score.UserId = uint(UserId)
+    score.Date = dt_begin
 
     if !score.Create() {
         msg := "Unknown error ocurred"

@@ -9,22 +9,33 @@ from flask import \
     render_template as render
 
 app = Flask(__name__, static_url_path='/static/')
-log_file = open("app.log", "a")
 
 def log(*args, **kwargs):
-    print(*args, **kwargs, file=log_file)
+    print(*args, **kwargs, file=open("app.log", "a"))
 
 @app.route('/dates', methods=['GET'])
 def date_filters():
     token = r.cookies.get("d3diamond_token")
-    response = post("http://api:8000/verify", headers={"Authorization":token})
+    response = post("http://api:8000/verify", headers={"Authorization": token})
     if response.status_code == 200 and response.json()['type'].lower() == 'sucess':
         user = response.json()['data']
-        log(user)
+
+        dates = []
         try:
-            dates = get("http://api:8000/user/{}/dates".format(user["id"])).json()['data']
-            for date in dates:
-                dates[date]["url"] = ""
+            pre_dates = get("http://api:8000/user/{}/dates".format(user["id"]), headers={"Authorization": token}).json()['data']
+            for date in pre_dates:
+                if "id" in date:
+                    del date["id"]
+
+                if "class" in date:
+                    del date["class"]
+
+                if date not in dates:
+                    d = dt.fromisoformat(date["date"][:10])
+
+                    date["date"] = f"{str(d.month).rjust(2).replace(' ', '0')}/{str(d.year).rjust(4).replace(' ', '0')}"
+                    date["url"] =  f"{str(d.year).rjust(4).replace(' ', '0')}{str(d.month).rjust(2).replace(' ', '0')}"
+                    dates.append(date)
         except:
             dates = None
 
@@ -86,13 +97,15 @@ def index():
             indices[l[i]] = j
             for s in scores:
                 if s['name'].lower() == j['name'].lower():
+                    if not "value" in s:
+                        s["value"] = 0
                     if not s['name'].lower() in scores_formated:
                         scores_formated[s['name'].lower()] = s
                         scores_formated[s['name'].lower()]["total"] = 1
                     else:
-                        if "value" in scores_formated[s['name'].lower()]:
-                            scores_formated[s['name'].lower()]["value"] += s["value"]
-                            scores_formated[s['name'].lower()]["total"] += 1
+                        scores_formated[s['name'].lower()]["value"] += s["value"]
+                        scores_formated[s['name'].lower()]["total"] += 1
+
             i += 1
 
         return render("index.html", user = user, indices = indices, scores = scores_formated)
@@ -129,13 +142,15 @@ def filter_by_date(date):
             indices[l[i]] = j
             for s in scores:
                 if s['name'].lower() == j['name'].lower():
+                    if not "value" in s:
+                        s["value"] = 0
                     if not s['name'].lower() in scores_formated:
                         scores_formated[s['name'].lower()] = s
                         scores_formated[s['name'].lower()]["total"] = 1
                     else:
-                        if "value" in scores_formated[s['name'].lower()]:
-                            scores_formated[s['name'].lower()]["value"] += s["value"]
-                            scores_formated[s['name'].lower()]["total"] += 1
+                        scores_formated[s['name'].lower()]["value"] += s["value"]
+                        scores_formated[s['name'].lower()]["total"] += 1
+
             i += 1
 
         return render("index.html", user = user, indices = indices, scores = scores_formated)

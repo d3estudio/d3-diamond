@@ -21,6 +21,7 @@ type ScoreType struct {
 
 type ScoreDate struct {
     sex.Model
+    ID        uint      `json:"-"`
     Date      time.Time `json:"date" gorm:"NOT NULL, index"`
     UserId    uint      `json:"-"`
 }
@@ -36,6 +37,7 @@ func dateRange(d string) (time.Time, time.Time) {
     }
 
     begin, err := time.Parse(d, format)
+    sex.SuperPut(begin,"\n   -> ", err)
     if err != nil {
         now := time.Now()
         y, m, d := now.Date()
@@ -44,6 +46,7 @@ func dateRange(d string) (time.Time, time.Time) {
 
         begin = time.Date(y, m, d, 0, 0, 0, 0, z)
     }
+    sex.SuperPut(begin)
 
     end := begin.AddDate(0, 1, 0)
     return begin, end
