@@ -11,7 +11,7 @@
     <link rel="stylesheet" media="all" href="/static/assets/main.css" />
     <link rel="stylesheet" media="all" href="/static/assets/radar-chart.css" />
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script type="text/javascript" src="https://d3js.org/d3.v3.js"></script>
+    <script src="https://d3js.org/d3.v6.min.js"></script>
     <script type="text/javascript" src="/static/assets/radar-chart.js"></script>
 </head>
 
@@ -32,7 +32,7 @@
 
         <div class="profile-date"></div>
         <h1 id="profile-name">Olá {{user["name"]}}!</h1>
-        
+
         <div id="profile-chart">
             <div id="chart-container"></div>
             <div id="container-mask"></div>
@@ -56,12 +56,7 @@
 
     <script type="text/javascript">
 
-    /* ----------------------------------------------
-    // Função que faz o parse e já atualiza a posição 
-    ---------------------------------------------- */
     function parseProfileData(profileData) {
-
-        document.getElementById('profile-name').innerHTML = profileData["NAME"];
 
         var range = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
         var grades = 
@@ -73,25 +68,8 @@
             var bigR = range[i].toUpperCase();
             console.log(range[i]);
 
-            var g = document.getElementById('grade-' + range[i]);
-            var gd = g.querySelector(".competence-grade");
-            var gv = g.querySelector(".change");
+            var grade = [range[i]];
 
-            // Aplica a nota
-            gd.innerHTML = Number(profileData[bigR]).toFixed(1);
-
-            // Mudar o status da nota
-            var variation = profileData["CHANGE_" + bigR];
-            var varClass = "neutral";
-            // mudar para um switch case
-            if (variation == -1) { varClass = "negative"; } else if (variation == 1) { varClass = "positive"; }
-            gv.className = "change " + varClass;
-
-            // !!!!!!!!!!!!!!!!!!!!
-            // Gera o array notas
-            // !!!!!!!!!!!!!!!!!!!!
-            var grade = [range[i]]; // Aplica o index
-            
               for (var a = 0; a < range.length-1; a++) {  
                 if(i==a){
                   grade.push(profileData[range[a].toUpperCase()]);
@@ -99,9 +77,8 @@
                 }else{
                   grade.push(0);
                 }
-              // }
             }
-            
+
             grades.push(grade);
             grades[10] = ["j", profileData[range[0].toUpperCase()],0,0,0,0,0,0,0,0,profileData[range[9].toUpperCase()]];
         }
@@ -157,29 +134,8 @@
         var divVal = document.getElementById('chart-container');
     }
 
-    /* ----------------------------------------------
-    // Buscar parâmetros na URL 
-    ---------------------------------------------- */
-    var getUrlParameter = function getUrlParameter(sParam) {
-        var sPageURL = window.location.search.substring(1),
-            sURLVariables = sPageURL.split('&'),
-            sParameterName,
-            i;
-
-        for (i = 0; i < sURLVariables.length; i++) {
-            sParameterName = sURLVariables[i].split('=');
-            if (sParameterName[0] === sParam) {
-                return sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
-            }
-        }
-    };
-
-    var profileID = getUrlParameter('u') ? getUrlParameter('u') : "asd97asdhasd87";
-
-    $.get("/api/" + profileID, function(data) {
-        showRadar(parseProfileData(data));
-    });
+    showRadar(parseProfileData(`{{csv|safe}}`));
     </script>
-    
+
     </body>
 </html>
