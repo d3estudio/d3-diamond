@@ -15,6 +15,7 @@ func main () {
         &UserRole{},
         &Score{},
         &ScoreType{},
+        &ScoreDate{},
     }
 
     if os.Getenv("DEBUG_MODE") == "true" {
@@ -222,6 +223,23 @@ func main () {
     ).
     Add(
         "post", "/score/{id}", nil, UpdateScore,
+    ).
+
+    // Date registered routes
+    Add(
+        "get", "/user/{id}/dates", nil, GetDates,
+    ).
+    Add(
+        "post", "/user/{id}/date", nil, CreateDate,
+    ).
+    Add(
+        "get", "/date/{id}", nil, GetDate,
+    ).
+    Add(
+        "delete", "/date/{id}", nil, DeleteDate,
+    ).
+    Add(
+        "post", "/date/{id}", nil, UpdateDate,
     )
 
     router.Run("/", 8000)

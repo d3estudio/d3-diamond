@@ -19,6 +19,11 @@ type ScoreType struct {
     Desc       string  `json:"desc,omitempty"`
 }
 
+type ScoreDate struct {
+    sex.Model
+    Date      time.Time `json:"date" gorm:"NOT NULL, index"`
+    UserId    uint      `json:"-"`
+}
 
 func dateRange(d string) (time.Time, time.Time) {
     sufix := "01T00:00:00.000Z"
