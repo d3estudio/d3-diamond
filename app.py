@@ -9,14 +9,18 @@ from flask import \
     render_template as render
 
 app = Flask(__name__, static_url_path='/static/')
-log = open("app.log", "a")
+log_file = open("app.log", "a")
+
+def log(*args, **kwargs):
+    print(*args, **kwargs, file=log_file)
 
 @app.route('/dates', methods=['GET'])
 def date_filters():
     token = r.cookies.get("d3diamond_token")
     response = post("http://api:8000/verify", headers={"Authorization":token})
-    if response.status_code == 200:
+    if response.status_code == 200 and response.json()['type'].lower() == 'sucess':
         user = response.json()['data']
+        log(user)
         try:
             dates = get("http://api:8000/user/{}/dates".format(user["id"])).json()['data']
             for date in dates:

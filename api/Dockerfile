@@ -1,6 +1,7 @@
-FROM golang:1.15-buster
+FROM archlinux
 LABEL maintainer Plankiton <pl4nk1ton@gmail.com>
 
+RUN pacman -Syu community/go --needed --noconfirm
 RUN mkdir /api/bin -p
 ADD . /api
 
