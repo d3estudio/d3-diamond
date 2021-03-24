@@ -14,4 +14,4 @@ EXPOSE 5000
 
 WORKDIR /app
 
-CMD flask run --host=0.0.0.0
+CMD flask run --host=0.0.0.0 > app.log 2> app.err.log
