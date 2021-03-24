@@ -22,21 +22,25 @@
         </div>
 
         <div class="profile-date"></div>
-        <h1 id="profile-name">Olá, por favor faça o login antes de prossegir!</h1>
-
-        {% if error %}
-        <div class="error-message">
-            <h2>{{error[0]}}</h2>
-            <p>{{error[1]}}</p>
-        </div>
+        {% if dates %}
+        <h1 id="profile-name">Olá {{user["name"]}}, Escolha por favor entre os meses disponiveis:</h1>
+        {% else %}
+        <h1 id="profile-name">Olá {{user["name"]}}!</h1>
         {% endif %}
 
-        <form action="/login" method="post">
-            <input type="email" placeholder="Digite aqui seu email" name="email" id="email" value="">
-            <input type="password" placeholder="Digite aqui sua senha" name="password" id="password" value="">
-
-            <input type="submit" name="send" id="send" value="Entrar">
-        </form>
+        <ul id="profile">
+            {% if dates %}
+            {% for date in dates %}
+            <a href="/{{date["url"]}}">
+                <li class="profile-grade" id="grade-a">
+                    <h3 class="competence-title">{{ date["date"] }}</h3>
+                </li>
+            </a>
+            {% endfor %}
+            {% else %}
+            <h3>Desculpe, mas você ainda não tem avaliações disponíveis! <strong>:(</strong> </h3
+            {% endif %}
+        </ul>
     </div>
     </body>
 </html>

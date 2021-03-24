@@ -17,9 +17,18 @@
 
 <body>
     <div id="wrapper">
-        <div id="logo">
-            <img id="logoD3" src="/static/assets/logo-d3.svg" alt="Logo d3">
-        </div>
+            <div id="logo">
+                <img id="logoD3" src="/static/assets/logo-d3.svg" alt="Logo d3">
+                <ul>
+                    <li class="profile-grade"><a href="/logout">
+                        <p class="competence-description">Logout</p>
+                    </a></li>
+                    <li class="profile-grade"><a href="/dates">
+                        <p class="competence-description">Ver resultados antigos</p>
+                    </a></li>
+                </ul>
+            </div>
+
 
         <div class="profile-date"></div>
         <h1 id="profile-name">Olá {{user["name"]}}!</h1>

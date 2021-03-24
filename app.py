@@ -11,6 +11,22 @@ from flask import \
 app = Flask(__name__, static_url_path='/static/')
 log = open("app.log", "a")
 
+@app.route('/dates', methods=['GET'])
+def date_filters():
+    token = r.cookies.get("d3diamond_token")
+    response = post("http://api:8000/verify", headers={"Authorization":token})
+    if response.status_code == 200:
+        user = response.json()['data']
+        try:
+            dates = get("http://api:8000/user/{}/dates".format(user["id"])).json()['data']
+            for date in dates:
+                dates[date]["url"] = ""
+        except:
+            dates = None
+
+        return render('dates.html', user = user, dates = dates)
+    return redirect("/login")
+
 @app.route('/logout', methods=['GET', 'POST'])
 def logout():
     token = r.cookies.get("d3diamond_token")
