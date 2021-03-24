@@ -1,65 +1,38 @@
-import gspread
-import json
-import os
-
-from flask import Flask
-from flask import jsonify
-from flask import send_from_directory
-from oauth2client.service_account import ServiceAccountCredentials
-
-scope = ['https://spreadsheets.google.com/feeds',
-         'https://www.googleapis.com/auth/drive']
-
-creds = ServiceAccountCredentials.from_json_keyfile_name('auth.json', scope)
-
-client = gspread.authorize(creds)
-sheet = client.open_by_key(os.environ["SHEET_ID"]).get_worksheet(0)
+from requests import get, post
+from flask import \
+    Flask, \
+    jsonify, \
+    redirect, \
+    request as r, \
+    render_template as render
 
 app = Flask(__name__, static_url_path='/static/')
 
+@app.login('/login', methods=['GET', 'POST'])
+def login():
+    pass
 
-@app.route('/api/<id>', methods=['GET'])
-def api(id):
-    for f in sheet.get_all_records():
-        if id == f["ID"]:
+@app.route('/', methods=['GET'])
+def index():
+    token = r
+    response = post("http://api:8000/verify", headers={"Authorization":token})
+    if response.status_code == 200:
+        user = response.json()['data']
+        scores = get("http://api:8000/user/2/scores", headers={"Authorization":token}).json()['data']
+        info = get("http://api:8000/score-type", headers={"Authorization":token}).json()['data']
 
-            f["A"] = float(str(f["A"]).replace(",", "."))
-            f["B"] = float(str(f["B"]).replace(",", "."))
-            f["C"] = float(str(f["C"]).replace(",", "."))
-            f["D"] = float(str(f["D"]).replace(",", "."))
-            f["E"] = float(str(f["E"]).replace(",", "."))
-            f["F"] = float(str(f["F"]).replace(",", "."))
-            f["G"] = float(str(f["G"]).replace(",", "."))
-            f["H"] = float(str(f["H"]).replace(",", "."))
-            f["I"] = float(str(f["I"]).replace(",", "."))
-            f["J"] = float(str(f["J"]).replace(",", "."))
+        indices = {}
 
-            f["CHANGE_A"] = float(str(f["CHANGE_A"]).replace(",", "."))
-            f["CHANGE_B"] = float(str(f["CHANGE_B"]).replace(",", "."))
-            f["CHANGE_C"] = float(str(f["CHANGE_C"]).replace(",", "."))
-            f["CHANGE_D"] = float(str(f["CHANGE_D"]).replace(",", "."))
-            f["CHANGE_E"] = float(str(f["CHANGE_E"]).replace(",", "."))
-            f["CHANGE_F"] = float(str(f["CHANGE_F"]).replace(",", "."))
-            f["CHANGE_G"] = float(str(f["CHANGE_G"]).replace(",", "."))
-            f["CHANGE_H"] = float(str(f["CHANGE_H"]).replace(",", "."))
-            f["CHANGE_I"] = float(str(f["CHANGE_I"]).replace(",", "."))
-            f["CHANGE_J"] = float(str(f["CHANGE_J"]).replace(",", "."))
+        i = 0
+        l = "abcdefghijklmnopqrstuvwxyz"
+        scores_formated = {}
+        for j in info:
+            indices[l[i]] = j
+            for s in scores:
+                if s['name'].lower() == j['name'].lower():
+                    scores_formated[s['name'].lower()] = s
+            i += 1
 
-            response = app.response_class(
-                response=json.dumps(f),
-                status=200,
-                mimetype='application/json'
-            )
-            return response
-
-    response = app.response_class(
-        response=json.dumps({}),
-        status=404,
-        mimetype='application/json'
-    )
-    return response
-
-
-@app.route('/')
-def home():
-    return app.send_static_file('index.html')
+        print(indices, file=open("PORRA.log", "a"))
+        return render("index.html", user = user, indices = indices, scores = scores_formated)
+    return redirect("/login")

@@ -62,9 +62,8 @@ func CreateScore(r sex.Request) (sex.Response, int) {
 
     Select("value").
     Where("user_id = ? AND sender_id = ? AND created_at < ?",
-    score.UserId, score.SenderId, dt_begin).Order("created_at desc, id desc").
-    First(&last).
-
+    score.UserId, score.SenderId, dt_begin).
+    Last(&last).
     Error == nil {
         score.Diff = score.Value - last
     }
