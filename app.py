@@ -4,17 +4,38 @@ from flask import \
     jsonify, \
     redirect, \
     request as r, \
+    make_response as mkres, \
     render_template as render
 
 app = Flask(__name__, static_url_path='/static/')
+log = open("app.log", "a")
 
-@app.login('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    pass
+    if r.method == 'GET':
+        return render("login.html")
+
+    email = r.form.get("email")
+    passw = r.form.get("password")
+
+    response = post("http://api:8000/login", json = {
+        "email": email,
+        "pass": passw
+    })
+
+    if response.status_code == 200:
+        token = response.json()['data']['token']
+
+        response = mkres(redirect("/"))
+        response.set_cookie("d3diamond_token", token)
+
+        return response
+
+    return render("login.html", error=["Falha no login", response.json()['message']])
 
 @app.route('/', methods=['GET'])
 def index():
-    token = r
+    token = r.cookies.get("d3diamond_token")
     response = post("http://api:8000/verify", headers={"Authorization":token})
     if response.status_code == 200:
         user = response.json()['data']
@@ -33,6 +54,5 @@ def index():
                     scores_formated[s['name'].lower()] = s
             i += 1
 
-        print(indices, file=open("PORRA.log", "a"))
         return render("index.html", user = user, indices = indices, scores = scores_formated)
     return redirect("/login")
