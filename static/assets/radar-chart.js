@@ -11,7 +11,7 @@ var RadarChart = {
     maxValue: 0,
     minValue: 0,
     radians: 2 * Math.PI,
-    color: d3.scale.category10(),
+    color: d3.scaleOrdinal(d3.schemeCategory10),
     axisLine: true,
     axisText: true,
     circles: false,
@@ -226,7 +226,7 @@ var RadarChart = {
         }
 
         polygon.enter().append(polygonType)
-        .classed({area: 1, 'd3-enter': 1})
+        //.classed({area: 1, 'd3-enter': 1})
         .on('mouseover', function (dd){
           d3.event.stopPropagation();
           container.classed('focus', 1);
@@ -357,7 +357,7 @@ var RadarChart = {
         cfg[arguments[0]] = arguments[1];
       }
       else {
-        d3.entries(value || {}).forEach(function(option) {
+        Object.entries(value || {}).forEach(function(option) {
           cfg[option.key] = option.value;
         });
       }

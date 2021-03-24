@@ -44,8 +44,8 @@ def log(*args, **kwargs):
     print(*args, **kwargs, file=open("app.log", "a"))
 
 def gen_csv(indices, scores):
-    # 'ID,NAME,DATE,A,B,C,D,E,F,G,H,I,J,CHANGE_A,CHANGE_B,CHANGE_C,CHANGE_D,CHANGE_E,CHANGE_F,CHANGE_G,CHANGE_H,CHANGE_I,CHANGE_J\n'
-    csv = ',,,'
+    csv = 'ID,NAME,DATE,A,B,C,D,E,F,G,H,I,J,CHANGE_A,CHANGE_B,CHANGE_C,CHANGE_D,CHANGE_E,CHANGE_F,CHANGE_G,CHANGE_H,CHANGE_I,CHANGE_J\n'
+    csv += ',,,'
 
     letters = "abcdefghijklmnopqrstuvwxyz"
     for l in letters:
