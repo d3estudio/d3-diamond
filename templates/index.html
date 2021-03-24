@@ -33,7 +33,7 @@
             {% for score in indices %}
             <li class="profile-grade" id="grade-a">
                 <div class="grade">
-                    <div class="competence-grade">{{ scores[indices[score]["name"].lower()]["value"] if indices[score]["name"].lower() in scores else None}}</div>
+                    <div class="competence-grade">{{ scores[indices[score]["name"].lower()]["value"]/scores[indices[score]["name"].lower()]["total"] if indices[score]["name"].lower() in scores and "value" in scores[indices[score]["name"].lower()] else '<span style="color:#888">&lt;Vazio&gt;</span>'|safe}}</div>
                     <div class="change {{("positive" if indices[score]["diff"] > 0 else "negative") if "diff" in indices[score] else "neutral"}})"></div>
                 </div>
                 <h3 class="competence-title">
