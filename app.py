@@ -10,10 +10,15 @@ from flask import \
 
 app = Flask(__name__, static_url_path='/static/')
 
-def load_scores(user, token):
+def load_scores(user, token, date=None, dateend=None):
+    query = ""
+    if date and dateend:
+        query = f"created_at BETWEEN '{date}' AND '{dateend}'"
+
     try:
         scores = get("http://api:8000/user/{}/scores".format(user["id"]), headers={
-            "Authorization": token
+            "Authorization": token,
+            "Query": query
         }).json()['data']
     except:
         scores = []
@@ -128,27 +133,21 @@ def login():
 
 
 @app.route('/', methods=['GET'])
-def index():
-    token = r.cookies.get("d3diamond_token")
-    response = post("http://api:8000/verify", headers={"Authorization":token})
-    if response.status_code == 200:
-        user = response.json()['data']
-        scores, info, indices = load_scores(user, token)
-
-        return render("index.html", user = user, indices = indices, scores = scores, csv = gen_csv(indices, scores))
-    return redirect("/login")
-
-
 @app.route("/<date>", methods = ["GET"])
-def filter_by_date(date):
-    date = dt.fromisoformat(date[:4]+"-"+date[4:]+"-01")
-    dateend = dt(day=date.day, month=date.month+1, year=date.year)
+def filter_by_date(date = None):
+    try:
+        date = dt.fromisoformat(date[:4]+"-"+date[4:]+"-01")
+        dateend = f'{date.year}-{date.month}-{date.day}'
+        date = date.isoformat()
+    except:
+        date = None
+        dateend = None
 
     token = r.cookies.get("d3diamond_token")
     response = post("http://api:8000/verify", headers={"Authorization":token})
     if response.status_code == 200:
         user = response.json()['data']
-        scores, info, indices = load_scores(user, token)
+        scores, info, indices = load_scores(user, token, date, dateend)
 
         return render("index.html", user = user, indices = indices, scores = scores, csv = gen_csv(indices, scores))
     return redirect("/login")
