@@ -1,0 +1,10 @@
+server { # simple reverse-proxy
+    listen       $NGINX_PORT;
+    server_name  $NGINX_HOST;
+    access_log   access.log  main;
+
+    # pass requests for dynamic content to rails/turbogears/zope, et al
+    location / {
+        proxy_pass      http://app:5000;
+    }
+}
