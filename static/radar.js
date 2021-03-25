@@ -56,6 +56,24 @@ function parseCSV(csv) {
     return grades;
 }
 
+var mycfg = {
+    color: function(i) {
+        c = [
+            '#1A1919',
+            '#111111',
+            '#3E3E3E',
+            '#323232',
+            '#424141',
+            '#605E5E',
+            '#7E7D7D',
+            '#9E9E9E',
+            '#CCCCCC',
+            '#0C0C0C',
+        ];
+        return c[i];
+    },
+}
+
 function showRadar(parsedcsv) {
     var data = [];
     var chart = RadarChart.chart();
@@ -83,28 +101,12 @@ function showRadar(parsedcsv) {
     RadarChart.defaultConfig.w = w;
     RadarChart.defaultConfig.h = h;
 
-    return data
-}
+    RadarChart.levelTrick = true;
+    RadarChart.draw("#chart-container", data, mycfg);
 
-var mycfg = {
-    color: function(i) {
-        c = [
-            '#1A1919',
-            '#111111',
-            '#3E3E3E',
-            '#323232',
-            '#424141',
-            '#605E5E',
-            '#7E7D7D',
-            '#9E9E9E',
-            '#CCCCCC',
-            '#0C0C0C',
-        ];
-        return c[i];
-    },
+    return data;
 }
+var chart_div = document.getElementById('chart-container');
 
 var csv = parseCSV(csv);
 var data = showRadar(csv);
-RadarChart.draw("#chart-container", data, mycfg);
-var divVal = document.getElementById('chart-container');
