@@ -1,6 +1,6 @@
 package main
-import "github.com/Plankiton/SexPistol"
+import SexDB "github.com/Plankiton/SexPistol/Database"
 
 type User struct {
-    sex.User
+    SexDB.User
 }

@@ -1,20 +1,21 @@
 package main
-import "github.com/Plankiton/SexPistol"
+import (
+    SexDB "github.com/Plankiton/SexPistol/Database"
+)
 
 type Role struct {
-    sex.Role
+    SexDB.Role
 }
 
 type UserRole struct {
-    sex.UserRole
+    SexDB.UserRole
 }
 
 func (self UserRole) Sign(user User, role Role) (User, Role) {
     self.UserId = user.ID
     self.RoleId = role.ID
 
-    if self.Create() {
-        sex.Log("Linked", sex.ToLabel(user.ID, user.ModelType), user.Name, "to", sex.ToLabel(role.ID, role.ModelType), role.Name)
+    if db.Create(&self) == nil {
         return user, role
     }
 
@@ -35,7 +36,7 @@ func (self Role) Unsign(user User) (User, Role) {
     link := UserRole{}
     e := db.Where("user_id = ? AND role_id = ?", user.ID, self.ID).First(&link)
     if e.Error == nil {
-        if link.Delete() {
+        if db.Delete(&link) == nil {
             return user, self
         }
     }

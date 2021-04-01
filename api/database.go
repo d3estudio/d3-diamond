@@ -1,7 +1,7 @@
 package main
 import (
-    "gorm.io/gorm"
+    SexDB "github.com/Plankiton/SexPistol/Database"
 )
 
-var db *gorm.DB
+var db *SexDB.Database
 var err error

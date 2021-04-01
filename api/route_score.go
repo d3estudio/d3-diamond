@@ -6,38 +6,43 @@ import (
     str "strconv"
 )
 
-func CreateScore(r sex.Request) (sex.Response, int) {
-    if !sex.ValidateData(r.Data, sex.GenericJsonObj) {
+func CreateScore(r Sex.Request) (Sex.Json, int) {
+    var data map[string]interface{}
+    if r.JsonBody(&data) != nil {
         msg := fmt.Sprint("Role create fail, data need to be a object")
-        sex.Err(msg)
-        return sex.Response {
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 400
     }
 
-    token := Token{}
-    token.ID = r.Token
-    curr := User{}; {
-        ok := false
-        if curr, ok = (token).GetUser();!ok {
-            msg := "Authentication fail, your user not exists"
-            sex.Err(msg)
-            return sex.Response {
-                Message: msg,
-                Type:    "Error",
-            }, 405
-        } }
+    token := Token {}
 
-    data := r.Data.(map[string]interface{})
+    auth := r.Header.Get("Authorization")
+    curr := User{}; if auth != "" {
+        db.First(&token, "id = ?", auth)
+        {
+            ok := false
+            if curr, ok = (token).GetUser();!ok {
+                msg := "Authentication fail, your user not exists"
+                Sex.Err(msg)
+                return Sex.Bullet {
+                    Message: msg,
+                    Type:    "Error",
+                }, 405
+            }
+        }
+    }
+
     score := Score{}
 
     dt_begin, dt_end := dateRange("")
     if db.First(&score, "name = ? AND sender_id = ? AND user_id = ? AND created_at BETWEEN ? AND ?",
     data["name"], curr.ID, r.PathVars["id"], dt_begin, dt_end).Error == nil {
         msg := "This score already exists"
-        sex.Err(msg)
-        return sex.Response {
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 400
@@ -45,14 +50,14 @@ func CreateScore(r sex.Request) (sex.Response, int) {
 
     if db.First(&ScoreType{}, "id = ?", data["name"]).Error != nil {
         msg := "Score type invalid"
-        sex.Err(msg)
-        return sex.Response {
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 400
     }
 
-    sex.MapTo(data, &score)
+    Sex.Copy(data, &score)
     UserId, _ := str.Atoi(r.PathVars["id"])
     score.UserId = uint(UserId)
     score.SenderId = curr.ID
@@ -68,46 +73,50 @@ func CreateScore(r sex.Request) (sex.Response, int) {
         score.Diff = score.Value - last
     }
 
-    if !score.Create() {
+    if db.Create(&score) != nil {
         msg := "Unknown error ocurred"
-        sex.Err(msg)
-        return sex.Response {
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 500
     }
 
-    return sex.Response {
-            Message: "Score created",
-            Type:    "Sucess",
-        }, 200
+    return Sex.Bullet {
+        Message: "Score created",
+        Type:    "Sucess",
+    }, 200
 }
 
-func GetScoreList(r sex.Request) (sex.Response, int) {
+func GetScoreList(r Sex.Request) (Sex.Json, int) {
     user := User{}
     if db.First(&user, "id = ?", r.PathVars["id"]).Error != nil {
         msg := fmt.Sprint("Score listing fail, user not found")
-        sex.Err(msg)
-        return sex.Response {
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 404
     }
 
-    token := Token{}
-    token.ID = r.Token
-    if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, user) {
-        msg := "Authentication fail, your user not exists or dont have permissions to acess this"
-        sex.Err(msg)
-        return sex.Response {
-            Message: msg,
-            Type:    "Error",
-        }, 405
+    token := Token {}
+
+    auth := r.Header.Get("Authorization")
+    if auth != "" {
+        db.First(&token, "id = ?", auth)
+        if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, user) {
+            msg := "Authentication fail, your user not exists or dont have permissions to acess this"
+            Sex.Err(msg)
+            return Sex.Bullet {
+                Message: msg,
+                Type:    "Error",
+            }, 405
+        }
     }
 
     score_list := []Score{}
 
-    query := r.Reader.Header.Get("Query")
+    query := r.Header.Get("Query")
     dt_begin, dt_end := dateRange(r.PathVars["date"])
     dt_begin = dt_begin.AddDate(0, -1, 0)
 
@@ -117,83 +126,83 @@ func GetScoreList(r sex.Request) (sex.Response, int) {
     r.PathVars["id"], dt_begin, dt_end).
     RowsAffected <= 0 {
         msg := "This user has no avaluations"
-        sex.Err(msg)
-        return sex.Response {
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 404
     }
 
-    return sex.Response {
+    return Sex.Bullet {
         Type: "Sucess",
         Data: score_list,
     }, 200
 }
 
-func GetScore(r sex.Request) (sex.Response, int) {
+func GetScore(r Sex.Request) (Sex.Json, int) {
     score := Score {}
     if db.First(&score, "id = ?", r.PathVars["id"]).Error != nil {
         msg := fmt.Sprint("Score not found")
-        sex.Err(msg)
-        return sex.Response {
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 404
     }
 
-    return sex.Response {
+    return Sex.Bullet {
         Type: "Success",
         Data: score,
     }, 200
 }
 
-func UpdateScore(r sex.Request) (sex.Response, int) {
+func UpdateScore(r Sex.Request) (Sex.Json, int) {
     score := Score {}
     if db.First(&score, "id = ?", r.PathVars["id"]).Error != nil {
         msg := fmt.Sprint("Score not found")
-        sex.Err(msg)
-        return sex.Response {
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 404
     }
 
-    if !score.Save() {
+    if db.Save(&score) != nil {
         msg := "Unknown error ocurred"
-        sex.Err(msg)
-        return sex.Response {
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 500
     }
 
-    return sex.Response {
+    return Sex.Bullet {
         Type: "Success",
         Message: "Score Updated",
     }, 200
 }
 
-func DeleteScore(r sex.Request) (sex.Response, int) {
+func DeleteScore(r Sex.Request) (Sex.Json, int) {
     score := Score {}
     if db.First(&score, "id = ?", r.PathVars["id"]).Error != nil {
         msg := fmt.Sprint("Score not found")
-        sex.Err(msg)
-        return sex.Response {
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 404
     }
 
-    if !score.Delete() {
+    if db.Delete(&score) != nil {
         msg := "Unknown error ocurred"
-        sex.Err(msg)
-        return sex.Response {
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 500
     }
 
-    return sex.Response {
+    return Sex.Bullet {
         Type: "Success",
         Message: "Score deleted",
     }, 200

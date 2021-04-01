@@ -2,7 +2,4 @@ module github.com/d3estudios/d3-diamond/api
 
 go 1.15
 
-require (
-	github.com/Plankiton/SexPistol v0.0.6
-	gorm.io/gorm v1.21.3
-)
+require github.com/Plankiton/SexPistol v0.2.5

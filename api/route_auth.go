@@ -1,18 +1,14 @@
 package main
 import (
     "github.com/Plankiton/SexPistol"
-    "time"
-    "fmt"
 )
 
-func LogIn(r sex.Request) (sex.Response, int) {
+func LogIn(r Sex.Request) (Sex.Json, int) {
     var data map[string]interface{}
-    if sex.ValidateData(r.Data, sex.GenericJsonObj) {
-        data = r.Data.(map[string]interface{})
-    } else {
-        msg := fmt.Sprint("Authentication fail, bad request, data need to be a object")
-        sex.Err(msg)
-        return sex.Response {
+    if r.JsonBody(&data) != nil {
+        msg := Sex.Fmt("Authentication fail, bad request, data need to be a object")
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 400
@@ -21,9 +17,9 @@ func LogIn(r sex.Request) (sex.Response, int) {
     user := User {}
 
     if db.First(&user, "email = ?", data["email"]).Error != nil {
-        msg := fmt.Sprint("Authentication fail, no users with \"", data["email"], "\" registered")
-        sex.Err(msg)
-        return sex.Response {
+        msg := Sex.Fmt("Authentication fail, no users with \"%s\" registered", data["email"])
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 404
@@ -32,9 +28,9 @@ func LogIn(r sex.Request) (sex.Response, int) {
         if user.CheckPass(data["pass"].(string)) {
             token := Token {}
             token.UserId = user.ID
-            token.Create()
+            db.Create(&token)
 
-            return sex.Response {
+            return Sex.Bullet {
                 Type: "Sucess",
                 Data: map[string]interface{} {
                     "token": token.ID,
@@ -44,64 +40,62 @@ func LogIn(r sex.Request) (sex.Response, int) {
         }
     }
 
-    msg := fmt.Sprint("Authentication fail, password from <", user.Name, ":", user.ID,"> is wrong, permission denied")
-    res := sex.Response {
-        Message: msg,
-        Type:    "Error",
-    }
-    res.SetCookie("token", r.Token, time.Hour*24*360*10, r)
-    return res, 403
-}
-
-func Verify(r sex.Request) (sex.Response, int) {
-    token := Token {}
-    if r.Token != "" {
-        db.First(&token, "id = ?", r.Token)
-        if user, ok := token.GetUser(); ok {
-            msg := fmt.Sprint("Token \"", r.Token, "\" Is valid")
-            sex.Log(msg)
-            res := sex.Response {
-                Type: "Sucess",
-                Data: user,
-            }
-
-            res.SetCookie("token", r.Token, time.Hour*24*360*10, r)
-            return res, 200
-        }
-    } else {
-        msg := fmt.Sprint("Authentication fail, this route need a token")
-        sex.Err(msg)
-        return sex.Response {
-            Message: msg,
-            Type:    "Error",
-        }, 400
-    }
-
-    msg := fmt.Sprint("Authentication fail, user not found, permission denied")
-    sex.Err(msg)
-    return sex.Response {
+    msg := Sex.Fmt("Authentication fail, password from <%s:%d> is wrong, permission denied", user.Name, user.ID)
+    return Sex.Bullet {
         Message: msg,
         Type:    "Error",
     }, 403
 }
 
-func LogOut(r sex.Request) (sex.Response, int) {
+func Verify(r Sex.Request) (Sex.Json, int) {
     token := Token {}
-    token.ID = r.Token
 
-    db.First(&token)
-    if token.Delete() {
-        msg := fmt.Sprint("Token \"", r.Token, "\" removed")
-        sex.Log(msg)
-        return sex.Response {
+    auth := r.Header.Get("Authorization")
+    if auth != "" {
+        db.First(&token, "id = ?", auth)
+        if user, ok := token.GetUser(); ok {
+            msg := Sex.Fmt("Token \"%s\" Is valid", auth)
+            Sex.Log(msg)
+            return Sex.Bullet {
+                Type: "Sucess",
+                Data: user,
+            }, 200
+
+        }
+    } else {
+        msg := Sex.Fmt("Authentication fail, this route need a token")
+        Sex.Err(msg)
+        return Sex.Bullet {
+            Message: msg,
+            Type:    "Error",
+        }, 400
+    }
+
+    msg := Sex.Fmt("Authentication fail, user not found, permission denied")
+    Sex.Err(msg)
+    return Sex.Bullet {
+        Message: msg,
+        Type:    "Error",
+    }, 403
+}
+
+func LogOut(r Sex.Request) (Sex.Json, int) {
+    token := Token {}
+    auth := r.Header.Get("Authorization")
+
+    db.First(&token, "id = ?", auth)
+    if db.Delete(&token) == nil {
+        msg := Sex.Fmt("Token \"%s\" removed", auth)
+        Sex.Log(msg)
+        return Sex.Bullet {
             Type: "Sucess",
             Message: msg,
         }, 200
     }
 
-    msg := fmt.Sprint("Token \"", r.Token, "\" can't be removed")
-    sex.Log(msg)
-    return sex.Response {
+    msg := Sex.Fmt("Token \"%s\" can't be removed", auth)
+    Sex.Log(msg)
+    return Sex.Bullet {
         Type: "Sucess",
         Message: msg,
     }, 500

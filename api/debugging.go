@@ -6,36 +6,36 @@ func test_user () {
         joao.Name = "Joao da Silva"
         joao.Email = "joao@j.com"
         joao.SetPass("maria")
-        joao.Create()
+        db.Create(&joao)
 
         maria := User{}
         maria.Name = "Maria da Silva"
         maria.Email = "maria@j.com"
         maria.SetPass("joao")
-        maria.Create()
+        db.Create(&maria)
 
         pedro := User{}
         pedro.Name = "Pedro da Silva"
         pedro.Email = "pedro@j.com"
         pedro.SetPass("pedro")
-        pedro.Create()
+        db.Create(&pedro)
 
         joao_login := Token{}
         joao_login.UserId = joao.ID
-        joao_login.Create()
+        db.Create(&joao_login)
         joao_login.ID = "joao_login_token"
-        joao_login.Save()
+        db.Save(&joao_login)
 
         maria_login := Token{}
         maria_login.UserId = maria.ID
-        maria_login.Create()
+        db.Create(&maria_login)
         maria_login.ID = "maria_login_token"
-        maria_login.Save()
+        db.Save(&maria_login)
 
         pedro_login := Token{}
         pedro_login.UserId = pedro.ID
-        pedro_login.Create()
+        db.Create(&pedro_login)
         pedro_login.ID = "pedro_login_token"
-        pedro_login.Save()
+        db.Save(&pedro_login)
     }
 }

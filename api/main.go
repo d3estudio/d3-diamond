@@ -1,14 +1,15 @@
 package main
 
 import (
+    SexDB "github.com/Plankiton/SexPistol/Database"
     "github.com/Plankiton/SexPistol"
     "os"
 )
 
 var con_str string = "host=localhost password=joaojoao dbname=d3diamond port=5432 sslmode=disable TimeZone=America/Araguaina"
 func main () {
-    var router sex.Pistol
-    models := []interface{}{
+    var router Sex.Pistol
+    models := []SexDB.ModelSkel {
         &User{},
         &Token{},
         &Role{},
@@ -19,228 +20,157 @@ func main () {
     }
 
     if os.Getenv("DEBUG_MODE") == "true" {
-        sex.Log("Entering on Debug mode, using sqlite database")
-        db, err = router.SignDB(":memory:", sex.Sqlite,   // Connection string can be set by env DB_URI too
-        models...)       // Models to create on database if not exists
+        Sex.Log("Entering on Debug mode, using sqlite database")
+        db, err = SexDB.Open(":memory:", SexDB.Sqlite)
+        db.AddModels(models...)
 
         test_user()
     } else {
-        sex.Log("Trying to connect to postgresql")
-        db, err = router.SignDB(con_str, sex.Postgres, // Connection string can be set by env DB_URI too
-        models...)       // Models to create on database if not exists
+        Sex.Log("Trying to connect to postgresql")
+        db, err = SexDB.Open(":memory:", SexDB.Postgres)
+        db.AddModels(models...)
     }
 
     if db.Take(&Role{}).Error != nil {
-        user := Role{}
+        user := new(Role)
         user.Name = "user"
         user.Desc = "Pode visualizar os próprios resultados e avaliar os colegas"
-        user.Create()
+        db.Create(user)
 
-        adm := Role{}
+        adm := new(Role)
         adm.Name = "admin"
         adm.Desc = "Pode fazer oque os usuários podem, além de Criar/Editar/Apagar ou gerar relatórios em CSV sobre os usuários"
-        adm.Create()
+        db.Create(adm)
 
-        founder := Role{}
+        founder := new(Role)
         founder.Name = "founder"
         founder.Desc = "Tem todas as permissões de admin, e pode mudar o role de qualquer usuário"
-        founder.Create()
+        db.Create(founder)
     }
 
     if db.Take(&ScoreType{}).Error != nil {
-        desbravamento := ScoreType{}
+        desbravamento := new(ScoreType)
         desbravamento.ID = "desbravamento"
         desbravamento.Desc = "Abrir mata virgem com facão. Coragem para explorar fronteiras além das já mapeadas."
-        desbravamento.Create()
+        db.Create(desbravamento)
 
-        comprometimento := ScoreType{}
+        comprometimento := new(ScoreType)
         comprometimento.ID = "comprometimento"
         comprometimento.Desc = "Honrar o compromisso. Absorver diferentes inteligências para crescer."
-        comprometimento.Create()
+        db.Create(comprometimento)
 
-        criatividade := ScoreType{}
+        criatividade := new(ScoreType)
         criatividade.ID = "criatividade"
         criatividade.Desc = "Sentir a sua veia criativa pulsar. Potência para criar com multidisciplinaridade e assim expandir soluções."
-        criatividade.Create()
+        db.Create(criatividade)
 
-        adaptabilidade := ScoreType{}
+        adaptabilidade := new(ScoreType)
         adaptabilidade.ID = "adaptabilidade"
         adaptabilidade.Desc = "N˜ão seja uma samambaia louca, seja um bambu. Conseguir operar em diferentes contextos e fluir."
-        adaptabilidade.Create()
+        db.Create(adaptabilidade)
 
-        contundencia := ScoreType{}
+        contundencia := new(ScoreType)
         contundencia.ID = "contundência"
         contundencia.Desc = "Quebrar o existe. Fôlego para questionar o existente, quebrar se necessário e recriar com confianca."
-        contundencia.Create()
+        db.Create(contundencia)
 
-        excelencia := ScoreType{}
+        excelencia := new(ScoreType)
         excelencia.ID = "excelência"
         excelencia.Desc = "Busca constante para aperfeiçoar a paixão. Realização das tarefas com o nível de excelência dentro da sua fase."
-        excelencia.Create()
+        db.Create(excelencia)
 
-        comunicacao := ScoreType{}
+        comunicacao := new(ScoreType)
         comunicacao.ID = "comunicação"
         comunicacao.Desc = "Não contar com telepatia. Prática da comunicação clara dentro do time."
-        comunicacao.Create()
+        db.Create(comunicacao)
 
-        autonomia := ScoreType{}
+        autonomia := new(ScoreType)
         autonomia.ID = "autonomia"
         autonomia.Desc = "Ser independente. Assumir responsabilidades, manter-se informado e saber para onde o time está indo."
-        autonomia.Create()
+        db.Create(autonomia)
 
-        realizacao := ScoreType{}
+        realizacao := new(ScoreType)
         realizacao.ID = "realização"
         realizacao.Desc = "Decolar e colocar na rua. Evoluir o projeto através da materialização das ideias criativas."
-        realizacao.Create()
+        db.Create(realizacao)
 
-        maturidade_emocional := ScoreType{}
+        maturidade_emocional := new(ScoreType)
         maturidade_emocional.ID = "maturidade emocional"
         maturidade_emocional.Desc = "Tato com as pessoas e chamego com a comunidade. Aprendizados através do poder da escuta com os outros."
-        maturidade_emocional.Create()
+        db.Create(maturidade_emocional)
     }
 
     if db.Take(&Token{}).Error != nil {
-        token := Token{}
+        token := new(Token)
         token.UserId = 1
-        token.Create()
+        db.Create(token)
         token.ID = "3ae3c630a26b2695974a9bae2b2fd0492e9fc81f"
-        token.Save()
+        db.Create(token)
     }
 
     if db.Take(&UserRole{}).Error != nil {
-        founder := Role{}
+        founder := new(Role)
         db.First(&founder, "name = ?", "founder")
 
-        root := UserRole{}
+        root := new(UserRole)
         root.UserId = 1
         root.RoleId = founder.ID
-        root.Create()
+        db.Create(root)
     }
 
     if err != nil {
-        sex.Die("Database connection fail!")
+        Sex.Die("Database connection fail!")
     }
 
-    sex.Log("Database connection sucessfull!")
+    Sex.Log("Database connection sucessfull!")
 
     router.Auth = true
     router.
 
     // Authentication routes
-    Add(
-        "post", "/login", sex.RouteConf {
-            "need-auth": false,
-        }, LogIn,
-    ).
-    Add(
-        "post", "/verify", nil, Verify,
-    ).
-    Add(
-        "post", "/logout", nil, LogOut,
-    ).
+    Add("/login", LogIn, "post").
+    Add("/verify", Verify, "post").
+    Add("/logout", LogOut, "post").
 
     // User managment routes
-    Add(
-        "get", "/user/", nil, GetUserList,
-    ).
-    Add(
-        "post", "/user/", sex.RouteConf {
-            "need-auth": false,
-        }, CreateUser,
-    ).
-    Add(
-        "get", "/user/{id}", nil, GetUser,
-    ).
-    Add(
-        "post", "/user/{id}", nil, UpdateUser,
-    ).
-    Add(
-        "delete", "/user/{id}", nil, DeleteUser,
-    ).
-    Add(
-        "get", "/user/{id}/roles", nil, GetRoleListByUser,
-    ).
+    Add("/user/", GetUserList, "get").
+    Add("/user/", CreateUser, "post").
+    Add("/user/{id}", GetUser, "get").
+    Add("/user/{id}", UpdateUser, "post").
+    Add("/user/{id}", DeleteUser, "delete").
+    Add("/user/{id}/roles", GetRoleListByUser, "get").
 
     // Role managment routes
-    Add(
-        "get", "/role/", nil, GetRoleList,
-    ).
-    Add(
-        "post", "/role/", sex.RouteConf {
-            "need-auth": false,
-        }, CreateRole,
-    ).
-    Add(
-        "get", "/role/{id}", nil, GetRole,
-    ).
-    Add(
-        "post", "/role/{id}", nil, UpdateRole,
-    ).
-    Add(
-        "delete", "/role/{id}", nil, DeleteRole,
-    ).
-    Add(
-        "post", "/role/{rid}/sign/{uid}", nil, RoleSignUser,
-    ).
-    Add(
-        "post", "/role/{rid}/unsign/{uid}", nil, RoleUnsignUser,
-    ).
-    Add(
-        "get", "/role/{id}/users", nil, GetUserListByRole,
-    ).
+    Add("/role/", GetRoleList, "get").
+    Add("/role/", CreateRole, "post").
+    Add("/role/{id}", GetRole, "get").
+    Add("/role/{id}", UpdateRole, "post").
+    Add("/role/{id}", DeleteRole, "delete").
+    Add("/role/{rid}/sign/{uid}", RoleSignUser, "post").
+    Add("/role/{rid}/unsign/{uid}", RoleUnsignUser, "post").
+    Add("/role/{id}/users", GetUserListByRole, "get").
 
     // ScoreType managment routes
-    Add(
-        "get", "/score-type/", nil, GetScoreTypeList,
-    ).
-    Add(
-        "post", "/score-type/", sex.RouteConf {
-            "need-auth": false,
-        }, CreateScoreType,
-    ).
-    Add(
-        "get", "/score-type/{id}", nil, GetScoreType,
-    ).
-    Add(
-        "post", "/score-type/{id}", nil, UpdateScoreType,
-    ).
-    Add(
-        "delete", "/score-type/{id}", nil, DeleteScoreType,
-    ).
+    Add("/score-type/", GetScoreTypeList, "get").
+    Add("/score-type/", CreateScoreType, "post").
+    Add("/score-type/{id}", GetScoreType, "get").
+    Add("/score-type/{id}", UpdateScoreType, "post").
+    Add("/score-type/{id}", DeleteScoreType, "delete").
 
     // Score managment routes
-    Add(
-        "post", "/user/{id}/score/", nil, CreateScore,
-    ).Add(
-        "get", "/user/{id}/scores/", nil, GetScoreList,
-    ).
+    Add("/user/{id}/score/", CreateScore, "post").
+    Add("/user/{id}/scores/", GetScoreList, "get").
 
-    Add(
-        "get", "/score/{id}", nil, GetScore,
-    ).
-    Add(
-        "post", "/score/{id}", nil, DeleteScore,
-    ).
-    Add(
-        "post", "/score/{id}", nil, UpdateScore,
-    ).
+    Add("/score/{id}", GetScore, "get").
+    Add("/score/{id}", DeleteScore, "post").
+    Add("/score/{id}", UpdateScore, "post").
 
     // Date registered routes
-    Add(
-        "get", "/user/{id}/dates", nil, GetDates,
-    ).
-    Add(
-        "post", "/user/{id}/date", nil, CreateDate,
-    ).
-    Add(
-        "get", "/date/{id}", nil, GetDate,
-    ).
-    Add(
-        "delete", "/date/{id}", nil, DeleteDate,
-    ).
-    Add(
-        "post", "/date/{id}", nil, UpdateDate,
-    )
+    Add("/user/{id}/dates", GetDates, "get").
+    Add("/user/{id}/date", CreateDate, "post").
+    Add("/date/{id}", GetDate, "get").
+    Add("/date/{id}", DeleteDate, "delete").
+    Add("/date/{id}", UpdateDate, "post")
 
     router.Run("/", 8000)
 }

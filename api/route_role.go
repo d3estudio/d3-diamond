@@ -10,50 +10,53 @@ import (
     "github.com/Plankiton/SexPistol"
 )
 
-func GetRole(r sex.Request) (sex.Response, int) {
+func GetRole(r Sex.Request) (Sex.Json, int) {
     u := Role {}
     if db.First(&u, "id = ?", r.PathVars["id"]).Error != nil {
         msg := fmt.Sprint("Role not found")
-        sex.Err(msg)
-        return sex.Response {
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 404
     }
 
-    return sex.Response {
+    return Sex.Bullet {
         Type: "Success",
         Data: u,
     }, 200
 }
 
-func CreateRole(r sex.Request) (sex.Response, int) {
-    token := Token{}
-    token.ID = r.Token
-    if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, nil) {
-        msg := "Authentication fail, your user not exists or dont have permissions to acess this"
-        sex.Err(msg)
-        return sex.Response {
-            Message: msg,
-            Type:    "Error",
-        }, 405
+func CreateRole(r Sex.Request) (Sex.Json, int) {
+    token := Token {}
+
+    auth := r.Header.Get("Authorization")
+    if auth != "" {
+        db.First(&token, "id = ?", auth)
+        if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, nil) {
+            msg := "Authentication fail, your user not exists or dont have permissions to acess this"
+            Sex.Err(msg)
+            return Sex.Bullet {
+                Message: msg,
+                Type:    "Error",
+            }, 405
+        }
     }
 
-    if !sex.ValidateData(r.Data, sex.GenericJsonObj) {
+    var data map[string]interface{}
+    if r.JsonBody(&data) != nil {
         msg := fmt.Sprint("Role create fail, data need to be a object")
-        sex.Err(msg)
-        return sex.Response {
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 400
     }
 
-    data := r.Data.(map[string]interface{})
-
     if _, e := data["name"]; !e {
         msg := "Role create fail, Obrigatory field \"name\""
-        sex.Err(msg)
-        return sex.Response {
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 400
@@ -61,8 +64,8 @@ func CreateRole(r sex.Request) (sex.Response, int) {
 
     if db.First(&Role {}, "name = ?", data["name"]).Error == nil {
         msg := fmt.Sprint("Role create fail, role already registered")
-        sex.Err(msg)
-        return sex.Response {
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 500
@@ -70,102 +73,113 @@ func CreateRole(r sex.Request) (sex.Response, int) {
 
     role := Role {}
 
-    sex.MapTo(data, &role)
-    role.Create()
+    Sex.Copy(data, &role)
+    db.Create(&role)
 
-    return sex.Response {
+    return Sex.Bullet {
         Type: "Sucess",
         Data: role,
     }, 200
 }
 
-func UpdateRole(r sex.Request) (sex.Response, int) {
-    token := Token{}
-    token.ID = r.Token
-    if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, nil) {
-        msg := "Authentication fail, your user not exists or dont have permissions to acess this"
-        sex.Err(msg)
-        return sex.Response {
-            Message: msg,
-            Type:    "Error",
-        }, 405
+func UpdateRole(r Sex.Request) (Sex.Json, int) {
+    token := Token {}
+
+    auth := r.Header.Get("Authorization")
+    if auth != "" {
+        db.First(&token, "id = ?", auth)
+        if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, nil) {
+            msg := "Authentication fail, your user not exists or dont have permissions to acess this"
+            Sex.Err(msg)
+            return Sex.Bullet {
+                Message: msg,
+                Type:    "Error",
+            }, 405
+        }
     }
 
-    if !sex.ValidateData(r.Data, sex.GenericJsonObj) {
+    var data map[string]interface{}
+    if r.JsonBody(&data) != nil {
         msg := fmt.Sprint("Role create fail, data need to be a object")
-        sex.Err(msg)
-        return sex.Response {
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 400
     }
 
-    data := r.Data.(map[string]interface{})
-
     role := Role{}
     if db.First(&role, "id = ?", r.PathVars["id"]).Error != nil {
         msg := fmt.Sprint("Role update fail, role not found")
-        sex.Err(msg)
-        return sex.Response {
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 404
     }
 
-    sex.MapTo(data, &role)
-    role.Save()
+    Sex.Copy(data, &role)
+    db.Save(&role)
 
-    return sex.Response {
+    return Sex.Bullet {
         Type: "Sucess",
         Data: role,
     }, 200
 }
 
-func DeleteRole(r sex.Request) (sex.Response, int) {
-    token := Token{}
-    token.ID = r.Token
-    if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, nil) {
-        msg := "Authentication fail, your user not exists or dont have permissions to acess this"
-        sex.Err(msg)
-        return sex.Response {
-            Message: msg,
-            Type:    "Error",
-        }, 405
+func DeleteRole(r Sex.Request) (Sex.Json, int) {
+    token := Token {}
+
+    auth := r.Header.Get("Authorization")
+    if auth != "" {
+        db.First(&token, "id = ?", auth)
+        if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, nil) {
+            msg := "Authentication fail, your user not exists or dont have permissions to acess this"
+            Sex.Err(msg)
+            return Sex.Bullet {
+                Message: msg,
+                Type:    "Error",
+            }, 405
+        }
     }
 
     role := Role{}
     if db.First(&role, "id = ?", r.PathVars["id"]).Error != nil {
         msg := fmt.Sprint("Role delete fail, role not found")
-        sex.Err(msg)
-        return sex.Response {
+        Sex.Err(msg)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 404
     }
 
-    role.Delete()
+    db.Delete(&role)
 
-    return sex.Response {
+    return Sex.Bullet {
         Type: "Sucess",
         Message: "Role deleted",
     }, 200
 }
 
-func RoleSignUser(r sex.Request) (sex.Response, int) {
-    token := Token{}
-    token.ID = r.Token
-    if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, nil) {
-        msg := "Authentication fail, your user not exists or dont have permissions to acess this"
-        sex.Err(msg)
-        return sex.Response {
-            Message: msg,
-            Type:    "Error",
-        }, 405
+func RoleSignUser(r Sex.Request) (Sex.Json, int) {
+    token := Token {}
+
+    auth := r.Header.Get("Authorization")
+    if auth != "" {
+        db.First(&token, "id = ?", auth)
+        if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, nil) {
+            msg := "Authentication fail, your user not exists or dont have permissions to acess this"
+            Sex.Err(msg)
+            return Sex.Bullet {
+                Message: msg,
+                Type:    "Error",
+            }, 405
+        }
     }
 
     user := User{}
     if db.First(&user, "id = ?", r.PathVars["uid"]).Error != nil {
-        return sex.Response{
+        return Sex.Bullet {
             Type: "Error",
             Message: "User not found",
         }, 404
@@ -173,7 +187,7 @@ func RoleSignUser(r sex.Request) (sex.Response, int) {
 
     role := Role{}
     if db.First(&role, "id = ?", r.PathVars["rid"]).Error != nil {
-        return sex.Response{
+        return Sex.Bullet {
             Type: "Error",
             Message: "Role not found",
         }, 404
@@ -181,35 +195,39 @@ func RoleSignUser(r sex.Request) (sex.Response, int) {
 
     user, role = role.Sign(user)
     if role.ID != 0 {
-        return sex.Response {
+        return Sex.Bullet {
             Type: "Sucess",
             Message: fmt.Sprint(user.Name, " Signed to ", role.Name),
         }, 200
     }
 
     msg := "This user already signed to this role"
-    sex.Err(msg)
-    return sex.Response {
+    Sex.Err(msg)
+    return Sex.Bullet {
         Type: "Sucess",
         Message: "This user isn't signed to this role",
     }, 500
 }
 
-func RoleUnsignUser(r sex.Request) (sex.Response, int) {
-    token := Token{}
-    token.ID = r.Token
-    if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, nil) {
-        msg := "Authentication fail, your user not exists or dont have permissions to acess this"
-        sex.Err(msg)
-        return sex.Response {
-            Message: msg,
-            Type:    "Error",
-        }, 405
+func RoleUnsignUser(r Sex.Request) (Sex.Json, int) {
+    token := Token {}
+
+    auth := r.Header.Get("Authorization")
+    if auth != "" {
+        db.First(&token, "id = ?", auth)
+        if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, nil) {
+            msg := "Authentication fail, your user not exists or dont have permissions to acess this"
+            Sex.Err(msg)
+            return Sex.Bullet {
+                Message: msg,
+                Type:    "Error",
+            }, 405
+        }
     }
 
     user := User{}
     if db.First(&user, "id = ?", r.PathVars["uid"]).Error != nil {
-        return sex.Response{
+        return Sex.Bullet {
             Type: "Error",
             Message: "User not found",
         }, 404
@@ -217,7 +235,7 @@ func RoleUnsignUser(r sex.Request) (sex.Response, int) {
 
     role := Role{}
     if db.First(&role, "id = ?", r.PathVars["rid"]).Error != nil {
-        return sex.Response{
+        return Sex.Bullet {
             Type: "Error",
             Message: "Role not found",
         }, 404
@@ -225,34 +243,38 @@ func RoleUnsignUser(r sex.Request) (sex.Response, int) {
 
     user, role = role.Unsign(user)
     if role.ID != 0 {
-        return sex.Response {
+        return Sex.Bullet {
             Type: "Sucess",
             Message: fmt.Sprint(user.Name, " Unsigned to ", role.Name),
         }, 200
     }
 
-    sex.Err("This user isn't signed to this role")
-    return sex.Response {
+    Sex.Err("This user isn't signed to this role")
+    return Sex.Bullet {
         Type: "Sucess",
         Message: "This user isn't signed to this role",
     }, 500
 }
 
-func GetUserListByRole(r sex.Request) (sex.Response, int) {
-    token := Token{}
-    token.ID = r.Token
-    if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, nil) {
-        msg := "Authentication fail, your user not exists or dont have permissions to acess this"
-        sex.Err(msg)
-        return sex.Response {
-            Message: msg,
-            Type:    "Error",
-        }, 405
+func GetUserListByRole(r Sex.Request) (Sex.Json, int) {
+    token := Token {}
+
+    auth := r.Header.Get("Authorization")
+    if auth != "" {
+        db.First(&token, "id = ?", auth)
+        if curr, ok := (token).GetUser();!ok || !CheckPermissions(curr, nil) {
+            msg := "Authentication fail, your user not exists or dont have permissions to acess this"
+            Sex.Err(msg)
+            return Sex.Bullet {
+                Message: msg,
+                Type:    "Error",
+            }, 405
+        }
     }
 
     role := Role{}
     if db.First(&role, "id = ?", r.PathVars["id"]).Error != nil {
-        return sex.Response{
+        return Sex.Bullet {
             Type: "Error",
             Message: "Role not found",
         }, 404
@@ -280,21 +302,21 @@ func GetUserListByRole(r sex.Request) (sex.Response, int) {
     Find(&role_list).Error
     if e != nil {
         msg := "Query error, query \""+r.Conf["headers"].(http.Header).Get("Query")+"\" is not valid"
-        sex.Err(msg, e)
-        return sex.Response {
+        Sex.Err(msg, e)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 400
     }
 
-    return sex.Response{
+    return Sex.Bullet {
         Type: "Sucess",
         Data: role_list,
     }, 200
 
 }
 
-func GetRoleList(r sex.Request) (sex.Response, int) {
+func GetRoleList(r Sex.Request) (Sex.Json, int) {
     limit, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("l"))
     page, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("p"))
 
@@ -317,14 +339,14 @@ func GetRoleList(r sex.Request) (sex.Response, int) {
     Find(&role_list).Error
     if e != nil {
         msg := "Query error, query \""+r.Conf["headers"].(http.Header).Get("Query")+"\" is not valid"
-        sex.Err(msg, e)
-        return sex.Response {
+        Sex.Err(msg, e)
+        return Sex.Bullet {
             Message: msg,
             Type:    "Error",
         }, 400
     }
 
-    return sex.Response{
+    return Sex.Bullet {
         Type: "Sucess",
         Data: role_list,
     }, 200

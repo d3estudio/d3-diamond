@@ -1,11 +1,11 @@
 package main
 import (
-    "github.com/Plankiton/SexPistol"
+    SexDB "github.com/Plankiton/SexPistol/Database"
     "time"
 )
 
 type Score struct {
-    sex.Model
+    SexDB.Model
     Name       string    `json:"name,omitempty"`
     Value      float64   `json:"value,omitempty"`
     UserId     uint      `json:"user_id,omitempty"`
@@ -14,16 +14,38 @@ type Score struct {
 }
 
 type ScoreType struct {
-    sex.ModelNoID
+    SexDB.Model
     ID         string  `json:"name,omitempty" gorm:"primaryKey"`
     Desc       string  `json:"desc,omitempty"`
 }
 
 type ScoreDate struct {
-    sex.Model
+    SexDB.Model
     ID        uint      `json:"-"`
     Date      time.Time `json:"date" gorm:"NOT NULL, index"`
     UserId    uint      `json:"-"`
+}
+
+func (model *ScoreDate) TableName() string {
+    return "score_dates"
+}
+
+func (model *ScoreType) TableName() string {
+    return "score_types"
+}
+
+func (model *Score) TableName() string {
+    return "scores"
+}
+
+func (model *Score) New() error {
+    dt_begin, _ := dateRange("")
+    if db.First(&ScoreDate{}, "user_id = ? and date = ?", model.UserId, dt_begin).Error != nil {
+        date := ScoreDate { Date: dt_begin, UserId: model.UserId}
+        db.Create(&date)
+    }
+
+    return nil
 }
 
 func dateRange(d string) (time.Time, time.Time) {
@@ -37,7 +59,6 @@ func dateRange(d string) (time.Time, time.Time) {
     }
 
     begin, err := time.Parse(d, format)
-    sex.SuperPut(begin,"\n   -> ", err)
     if err != nil {
         now := time.Now()
         y, m, d := now.Date()
@@ -46,8 +67,8 @@ func dateRange(d string) (time.Time, time.Time) {
 
         begin = time.Date(y, m, d, 0, 0, 0, 0, z)
     }
-    sex.SuperPut(begin)
 
     end := begin.AddDate(0, 1, 0)
     return begin, end
 }
+
