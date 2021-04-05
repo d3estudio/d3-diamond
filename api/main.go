@@ -27,7 +27,7 @@ func main () {
         test_user()
     } else {
         Sex.Log("Trying to connect to postgresql")
-        db, err = SexDB.Open(":memory:", SexDB.Postgres)
+        db, err = SexDB.Open(con_str, SexDB.Postgres)
         db.AddModels(models...)
     }
 

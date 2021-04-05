@@ -48,24 +48,11 @@ func (model *Score) New() error {
     return nil
 }
 
-func dateRange(d string) (time.Time, time.Time) {
-    sufix := "01T00:00:00.000Z"
-    format := "2006-01-02T15:04:05.000Z"
-    now := time.Now().Format(format)[:8]+sufix
-    if d == "" {
-        d = now
-    } else if len(d) <= 8 {
-        d += sufix
-    }
-
-    begin, err := time.Parse(d, format)
+func dateRange(date string) (time.Time, time.Time) {
+    format := "2006-01-02"
+    begin, err := time.Parse(format, date)
     if err != nil {
-        now := time.Now()
-        y, m, d := now.Date()
-        z := now.Location()
-        d = 1
-
-        begin = time.Date(y, m, d, 0, 0, 0, 0, z)
+        begin = time.Now()
     }
 
     end := begin.AddDate(0, 1, 0)
