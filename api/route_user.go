@@ -229,13 +229,9 @@ func GetUserList(r Sex.Request) (Sex.Json, int) {
     r.Conf["query"].(url.Values).Del("l")
     r.Conf["query"].(url.Values).Del("p")
 
-    query := r.Conf["query"].(url.Values).Encode()
-    query = str.ReplaceAll(query, "&", " AND ")
-    query = str.ReplaceAll(query, "|", " OR ")
-
     user_list := []User{}
     offset := (page - 1) * limit
-    e := db.Offset(offset).Limit(limit).Order("created_at desc, updated_at, id").Find(&user_list, query)
+    e := db.Offset(offset).Limit(limit).Order("created_at desc, updated_at, id").Find(&user_list)
 
     if e.Error != nil {
         msg := "Error on getting of users"
@@ -289,25 +285,17 @@ func GetRoleListByUser(r Sex.Request) (Sex.Json, int) {
     limit, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("l"))
     page, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("p"))
 
-    query := r.Conf["headers"].(http.Header).Get("Query")
-    query = str.ReplaceAll(query, "&&", " AND ")
-    query = str.ReplaceAll(query, "||", " OR ")
-
-    if query != "" {
-        query = " AND "+query
-    }
-
     role_list := []map[string]interface{}{}
 
     offset := (page - 1) * limit
     e := db.Table("roles r").Select("r.*").
     Order("r.created_at desc, r.updated_at, r.id").
     Joins("join user_roles l").
-    Joins("join users u on l.user_id = u.id AND l.role_id = r.id AND u.id = ?"+ query, user.ID).
+    Joins("join users u on l.user_id = u.id AND l.role_id = r.id AND u.id = ?", user.ID).
     Offset(offset).Limit(limit).
     Find(&role_list).Error
     if e != nil {
-        msg := "Query error, query \""+r.Conf["headers"].(http.Header).Get("Query")+"\" is not valid"
+        msg := "Unknown error ocurred"
         Sex.Err(msg, e)
         return Sex.Bullet {
             Message: msg,

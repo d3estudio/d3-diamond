@@ -283,30 +283,22 @@ func GetUserListByRole(r Sex.Request) (Sex.Json, int) {
     limit, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("l"))
     page, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("p"))
 
-    query := r.Conf["headers"].(http.Header).Get("Query")
-    query = str.ReplaceAll(query, "&&", " AND ")
-    query = str.ReplaceAll(query, "||", " OR ")
-
-    if query != "" {
-        query = " AND "+query
-    }
-
     role_list := []map[string]interface{}{}
 
     offset := (page - 1) * limit
     e := db.Table("users u").Select("u.name, u.genre, u.updated_at, u.created_at, u.email").
     Order("r.created_at desc, r.updated_at, r.id").
     Joins("join user_roles l").
-    Joins("join roles r on l.user_id = u.id AND l.role_id = r.id AND r.id = ?"+ query, role.ID).
+    Joins("join roles r on l.user_id = u.id AND l.role_id = r.id AND r.id = ?", role.ID).
     Offset(offset).Limit(limit).
     Find(&role_list).Error
     if e != nil {
-        msg := "Query error, query \""+r.Conf["headers"].(http.Header).Get("Query")+"\" is not valid"
+        msg := "Unknown error"
         Sex.Err(msg, e)
         return Sex.Bullet {
             Message: msg,
             Type:    "Error",
-        }, 400
+        }, 500
     }
 
     return Sex.Bullet {
@@ -320,25 +312,17 @@ func GetRoleList(r Sex.Request) (Sex.Json, int) {
     limit, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("l"))
     page, _ := sc.Atoi(r.Conf["query"].(url.Values).Get("p"))
 
-    query := r.Conf["headers"].(http.Header).Get("Query")
-    query = str.ReplaceAll(query, "&&", " AND ")
-    query = str.ReplaceAll(query, "||", " OR ")
-
-    if query != "" {
-        query = " AND "+query
-    }
-
     role_list := []map[string]interface{}{}
 
     offset := (page - 1) * limit
     e := db.Table("roles r").Select("r.*").
     Order("r.created_at desc, r.updated_at, r.id").
     Joins("join user_roles l").
-    Joins("join users u on l.user_id = u.id AND l.role_id = r.id"+ query).
+    Joins("join users u on l.user_id = u.id AND l.role_id = r.id").
     Offset(offset).Limit(limit).
     Find(&role_list).Error
     if e != nil {
-        msg := "Query error, query \""+r.Conf["headers"].(http.Header).Get("Query")+"\" is not valid"
+        msg := "Unknown error ocurred"
         Sex.Err(msg, e)
         return Sex.Bullet {
             Message: msg,

@@ -175,13 +175,9 @@ func GetScoreTypeList(r Sex.Request) (Sex.Json, int) {
     r.Conf["query"].(url.Values).Del("l")
     r.Conf["query"].(url.Values).Del("p")
 
-    query := r.Conf["query"].(url.Values).Encode()
-    query = str.ReplaceAll(query, "&", " AND ")
-    query = str.ReplaceAll(query, "|", " OR ")
-
     score_list := []ScoreType{}
     offset := (page - 1) * limit
-    e := db.Offset(offset).Limit(limit).Order("created_at desc, updated_at, id").Find(&score_list, query)
+    e := db.Offset(offset).Limit(limit).Order("created_at desc, updated_at, id").Find(&score_list)
 
     if e.Error != nil {
         return Sex.Bullet {

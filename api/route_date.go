@@ -81,9 +81,7 @@ func GetDates(r Sex.Request) (Sex.Json, int) {
 
     score_list := []ScoreDate{}
 
-    query := r.Header.Get("Query")
     if db.Table("score_dates").
-    Where(query).
     Find(&score_list, "user_id = ?",
     r.PathVars["id"]).
     RowsAffected <= 0 {

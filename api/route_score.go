@@ -116,12 +116,10 @@ func GetScoreList(r Sex.Request) (Sex.Json, int) {
 
     score_list := []Score{}
 
-    query := r.Header.Get("Query")
     dt_begin, dt_end := dateRange(r.PathVars["date"])
     dt_begin = dt_begin.AddDate(0, -1, 0)
 
     if db.Table("scores").
-    Where(query).
     Find(&score_list, "user_id = ? AND created_at BETWEEN ? AND ?",
     r.PathVars["id"], dt_begin, dt_end).
     RowsAffected <= 0 {
