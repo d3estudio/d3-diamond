@@ -105,7 +105,7 @@ func CreateUser(r Sex.Request) (Sex.Json, int) {
 
     Sex.Copy(data, &user)
     user.SetPass(data["pass"].(string))
-    db.Create(&user)
+    db.Add(&user)
 
     role := Role{}
     db.First(&role, "name = ?", "user")
@@ -160,7 +160,7 @@ func UpdateUser(r Sex.Request) (Sex.Json, int) {
         user.SetPass(data["pass"].(string))
     }
 
-    if db.Save(&user) == nil {
+    if db.Sav(&user) == nil {
         return Sex.Bullet {
             Type: "Sucess",
             Data: user,
@@ -200,7 +200,7 @@ func DeleteUser(r Sex.Request) (Sex.Json, int) {
     }
 
 
-    db.Delete(&user)
+    db.Del(&user)
 
     return Sex.Bullet {
         Type: "Sucess",

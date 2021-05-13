@@ -73,7 +73,7 @@ func CreateScore(r Sex.Request) (Sex.Json, int) {
         score.Diff = score.Value - last
     }
 
-    if db.Create(&score) != nil {
+    if db.Add(&score) != nil {
         msg := "Unknown error ocurred"
         Sex.Err(msg)
         return Sex.Bullet {
@@ -165,7 +165,7 @@ func UpdateScore(r Sex.Request) (Sex.Json, int) {
         }, 404
     }
 
-    if db.Save(&score) != nil {
+    if db.Sav(&score) != nil {
         msg := "Unknown error ocurred"
         Sex.Err(msg)
         return Sex.Bullet {
@@ -191,7 +191,7 @@ func DeleteScore(r Sex.Request) (Sex.Json, int) {
         }, 404
     }
 
-    if db.Delete(&score) != nil {
+    if db.Del(&score) != nil {
         msg := "Unknown error ocurred"
         Sex.Err(msg)
         return Sex.Bullet {

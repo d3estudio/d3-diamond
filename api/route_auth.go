@@ -28,7 +28,7 @@ func LogIn(r Sex.Request) (Sex.Json, int) {
         if user.CheckPass(data["pass"].(string)) {
             token := Token {}
             token.UserId = user.ID
-            db.Create(&token)
+            db.Add(&token)
 
             return Sex.Bullet {
                 Type: "Sucess",

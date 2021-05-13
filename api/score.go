@@ -42,7 +42,7 @@ func (model *Score) New() error {
     dt_begin, _ := dateRange("")
     if db.First(&ScoreDate{}, "user_id = ? and date = ?", model.UserId, dt_begin).Error != nil {
         date := ScoreDate { Date: dt_begin, UserId: model.UserId}
-        db.Create(&date)
+        db.Add(&date)
     }
 
     return nil

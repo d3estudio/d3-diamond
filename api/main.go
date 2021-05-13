@@ -35,77 +35,77 @@ func main () {
         user := new(Role)
         user.Name = "user"
         user.Desc = "Pode visualizar os próprios resultados e avaliar os colegas"
-        db.Create(user)
+        db.Add(user)
 
         adm := new(Role)
         adm.Name = "admin"
         adm.Desc = "Pode fazer oque os usuários podem, além de Criar/Editar/Apagar ou gerar relatórios em CSV sobre os usuários"
-        db.Create(adm)
+        db.Add(adm)
 
         founder := new(Role)
         founder.Name = "founder"
         founder.Desc = "Tem todas as permissões de admin, e pode mudar o role de qualquer usuário"
-        db.Create(founder)
+        db.Add(founder)
     }
 
     if db.Take(&ScoreType{}).Error != nil {
         desbravamento := new(ScoreType)
         desbravamento.ID = "desbravamento"
         desbravamento.Desc = "Abrir mata virgem com facão. Coragem para explorar fronteiras além das já mapeadas."
-        db.Create(desbravamento)
+        db.Add(desbravamento)
 
         comprometimento := new(ScoreType)
         comprometimento.ID = "comprometimento"
         comprometimento.Desc = "Honrar o compromisso. Absorver diferentes inteligências para crescer."
-        db.Create(comprometimento)
+        db.Add(comprometimento)
 
         criatividade := new(ScoreType)
         criatividade.ID = "criatividade"
         criatividade.Desc = "Sentir a sua veia criativa pulsar. Potência para criar com multidisciplinaridade e assim expandir soluções."
-        db.Create(criatividade)
+        db.Add(criatividade)
 
         adaptabilidade := new(ScoreType)
         adaptabilidade.ID = "adaptabilidade"
         adaptabilidade.Desc = "N˜ão seja uma samambaia louca, seja um bambu. Conseguir operar em diferentes contextos e fluir."
-        db.Create(adaptabilidade)
+        db.Add(adaptabilidade)
 
         contundencia := new(ScoreType)
         contundencia.ID = "contundência"
         contundencia.Desc = "Quebrar o existe. Fôlego para questionar o existente, quebrar se necessário e recriar com confianca."
-        db.Create(contundencia)
+        db.Add(contundencia)
 
         excelencia := new(ScoreType)
         excelencia.ID = "excelência"
         excelencia.Desc = "Busca constante para aperfeiçoar a paixão. Realização das tarefas com o nível de excelência dentro da sua fase."
-        db.Create(excelencia)
+        db.Add(excelencia)
 
         comunicacao := new(ScoreType)
         comunicacao.ID = "comunicação"
         comunicacao.Desc = "Não contar com telepatia. Prática da comunicação clara dentro do time."
-        db.Create(comunicacao)
+        db.Add(comunicacao)
 
         autonomia := new(ScoreType)
         autonomia.ID = "autonomia"
         autonomia.Desc = "Ser independente. Assumir responsabilidades, manter-se informado e saber para onde o time está indo."
-        db.Create(autonomia)
+        db.Add(autonomia)
 
         realizacao := new(ScoreType)
         realizacao.ID = "realização"
         realizacao.Desc = "Decolar e colocar na rua. Evoluir o projeto através da materialização das ideias criativas."
-        db.Create(realizacao)
+        db.Add(realizacao)
 
         maturidade_emocional := new(ScoreType)
         maturidade_emocional.ID = "maturidade emocional"
         maturidade_emocional.Desc = "Tato com as pessoas e chamego com a comunidade. Aprendizados através do poder da escuta com os outros."
-        db.Create(maturidade_emocional)
+        db.Add(maturidade_emocional)
     }
 
     if db.Take(&Token{}).Error != nil {
         token := new(Token)
         token.UserId = 1
-        db.Create(token)
+        db.Add(token)
         token.ID = "3ae3c630a26b2695974a9bae2b2fd0492e9fc81f"
-        db.Create(token)
+        db.Add(token)
     }
 
     if db.Take(&UserRole{}).Error != nil {
@@ -115,7 +115,7 @@ func main () {
         root := new(UserRole)
         root.UserId = 1
         root.RoleId = founder.ID
-        db.Create(root)
+        db.Add(root)
     }
 
     if err != nil {

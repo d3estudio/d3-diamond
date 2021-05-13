@@ -74,7 +74,7 @@ func CreateScoreType(r Sex.Request) (Sex.Json, int) {
     score_type := ScoreType {}
 
     Sex.Copy(data, &score_type)
-    db.Create(&score_type)
+    db.Add(&score_type)
 
     return Sex.Bullet {
         Type: "Sucess",
@@ -120,7 +120,7 @@ func UpdateScoreType(r Sex.Request) (Sex.Json, int) {
     }
 
     Sex.Copy(data, &score_type)
-    db.Save(&score_type)
+    db.Sav(&score_type)
 
     return Sex.Bullet {
         Type: "Sucess",
@@ -154,7 +154,7 @@ func DeleteScoreType(r Sex.Request) (Sex.Json, int) {
         }, 404
     }
 
-    if db.Delete(&score_type) == nil {
+    if db.Del(&score_type) == nil {
         return Sex.Bullet {
             Type: "Sucess",
             Message: "ScoreType deleted",

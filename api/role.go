@@ -15,7 +15,7 @@ func (self UserRole) Sign(user User, role Role) (User, Role) {
     self.UserId = user.ID
     self.RoleId = role.ID
 
-    if db.Create(&self) == nil {
+    if db.Add(&self) == nil {
         return user, role
     }
 
@@ -36,7 +36,7 @@ func (self Role) Unsign(user User) (User, Role) {
     link := UserRole{}
     e := db.Where("user_id = ? AND role_id = ?", user.ID, self.ID).First(&link)
     if e.Error == nil {
-        if db.Delete(&link) == nil {
+        if db.Del(&link) == nil {
             return user, self
         }
     }

@@ -74,7 +74,7 @@ func CreateRole(r Sex.Request) (Sex.Json, int) {
     role := Role {}
 
     Sex.Copy(data, &role)
-    db.Create(&role)
+    db.Add(&role)
 
     return Sex.Bullet {
         Type: "Sucess",
@@ -119,7 +119,7 @@ func UpdateRole(r Sex.Request) (Sex.Json, int) {
     }
 
     Sex.Copy(data, &role)
-    db.Save(&role)
+    db.Sav(&role)
 
     return Sex.Bullet {
         Type: "Sucess",

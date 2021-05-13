@@ -38,7 +38,7 @@ func CreateDate(r Sex.Request) (Sex.Json, int) {
     score.UserId = uint(UserId)
     score.Date = dt_begin
 
-    if db.Create(&score) != nil {
+    if db.Add(&score) != nil {
         msg := "Unknown error ocurred"
         Sex.Err(msg)
         return Sex.Bullet {
@@ -127,7 +127,7 @@ func UpdateDate(r Sex.Request) (Sex.Json, int) {
         }, 404
     }
 
-    if db.Save(&score) != nil {
+    if db.Sav(&score) != nil {
         msg := "Unknown error ocurred"
         Sex.Err(msg)
         return Sex.Bullet {
@@ -153,7 +153,7 @@ func DeleteDate(r Sex.Request) (Sex.Json, int) {
         }, 404
     }
 
-    if db.Delete(&score) != nil {
+    if db.Del(&score) != nil {
         msg := "Unknown error ocurred"
         Sex.Err(msg)
         return Sex.Bullet {
